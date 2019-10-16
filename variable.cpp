@@ -2,11 +2,12 @@
 variable::variable(){
 	type=TYPE_NONE;
 	value=NULL;
-	naint=1;
+	naint=true;
+	size = 1;
 }
 variable::variable(float n){
 	this->type=TYPE_NUMBER;
-	if ((n-int(n))<1e-5){
+	if ((int)n==n){
 		naint=false;
 		this->value=new int;
 		*((int*)this->value)=int(n);
@@ -16,16 +17,40 @@ variable::variable(float n){
 		this->value=new float;
 		*((float*)this->value)=n;
 		}
+	size = 1;
 }
 variable::variable(string str){
 	this->type=TYPE_STR;
 	this->value=new string(str);
 	naint=true;
+	size = 1;
 }
-variable::variable(vector<variable> a){
+variable::variable(variable &var) {
+	this->type = var.type;
+	if (this->type == TYPE_NUMBER)
+		if (this->naint)
+			this->value = new float(*((float*)var.value));
+		else
+			this->value = new int(*((int*)var.value));
+	else if (this->type == TYPE_STR)
+		this->value = new string(*((string*)var.value));
+	else if (this->type == TYPE_LIST) {
+		value = new variable[var.size];
+		for (int i = 0; i <var.size; i++) {
+			*((variable*)(value)+i) = *new variable(*((variable*)(var.value) + i));
+		}
+	}
+	else if (this->type == TYPE_NONE) {
+	}
+	this->naint = var.naint;
+	size = var.size;
+}
+
+variable::variable(variable *a,int n){
 	this->type=TYPE_LIST;
-	this->value=&a;
+	this->value=a;
 	naint=true;
+	size = n;
 }
 int variable::print(bool b) {
 
@@ -38,12 +63,11 @@ int variable::print(bool b) {
 		cout<<*((string*)this->value);
 	else if (this->type==TYPE_LIST){
 		cout<<"[";
-		vector<variable> vec=*((vector<variable>*)this->value);
-			if (vec.size()!=0){
-				vec.at(0).print(false);
-			for (int i = 1; i < vec.size() ; i++){
+			if (size!=0){
+				(*(variable*)value).print(false);
+			for (int i = 1; i < size ; i++){
 				cout<<",";
-				vec.at(i).print(false);
+				(*((variable*)value+i)).print(false);
 			}
 		}
 		cout<<"]";
@@ -56,6 +80,7 @@ int variable::print(bool b) {
 	return 0;
 }
 variable::~variable(){
+	cout << "variable deconstructor start" << endl;
 	if (type==TYPE_NUMBER)
 		if (naint)
 			delete((float*)value);
@@ -63,7 +88,10 @@ variable::~variable(){
 			delete((int*)value);
 	else if (type==TYPE_STR)
 		delete((string*)value);
-	else if (type==TYPE_LIST)
-	delete((vector<variable>*)value);
+	else if (type == TYPE_LIST) {
+		for (int i = 0; i < size; i++) {
+			delete((variable*)(value)+i);
+		}
+	}
 
 }

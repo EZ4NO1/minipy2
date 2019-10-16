@@ -1,17 +1,21 @@
 #ifndef VARMAP_H
 #define VARMAP_H
-#include <map>
 #include "variable.h"
-//#endif
+#define VARMAP_MAX_LENGTH 99
 class varmap{
-	public:
-	map<string,variable> vmap;
-	public:
+public:
+	string ka[VARMAP_MAX_LENGTH];
+	variable* va[VARMAP_MAX_LENGTH] = {0};
+	int size=0;
 	varmap();
-	~varmap();
+	void insert(string,float);
+	void insert(string,string);
+	//void insert(string,string*,int );
+	void insert_copy(string, string);
+	variable* at(string);
 	variable* get(string);
-	variable* crevar(string,variable);
-	int delvar(string);
-	int print(string);
+	bool exsit(string);
+	void print(string);
+	~varmap();
 };
 #endif
