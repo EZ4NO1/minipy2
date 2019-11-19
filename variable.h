@@ -2,27 +2,45 @@
 #define VARIABLE_H
 #include <iostream>
 #include <string>
-#include <vector>
-#define TYPE_NUMBER 0 
-#define TYPE_STR 1
-#define TYPE_LIST 2
-#define TYPE_FUN 3
-#define TYPE_NONE 4
+#define TYPE_INT 0
+#define TYPE_FLOAT 1
+#define TYPE_STR 2
+#define TYPE_LIST 3
+#define TYPE_FUN 4
+#define TYPE_NONE 5
+#define TYPE_LEFT 6
+#define TYPE_LEFTLIST 7
 using namespace std;
 class variable {
 public:
 	int type = 4;
 	void* value = 0;
-	bool naint = true;//not a int
+	//bool naint = true;//not a int
+	bool anony = true;
 	int size = 0;
 public:
 	variable();
-	variable(float);
-	variable(string);
-	variable(variable*, int);
-	variable(variable&);
-	int print(bool b = true);
+	variable(float,bool=true);
+	variable(int, bool=true);
+	variable(string,bool=true);
+	variable(variable**, int,bool=true);
+	variable(variable*,bool=true);
+	variable(variable**);//left-type ONLY
+	variable(variable***,int);//left-list-type ONLY
+	void print(bool b = true);
 	~variable();
+	static void deleteannoy(variable*);
+	static variable* add(variable*, variable*);
+	static variable* sub(variable*, variable*);
+	static variable* mul(variable*, variable*);
+	static variable* div(variable*, variable*);
+	static variable* mod(variable*, variable*);
+	static variable* at(variable*, variable*);
+	static variable* slice(variable*, variable*,variable*, variable*);
+	static variable* leftat(variable*, variable*);
+	static variable* leftslice(variable*, variable*,variable*, variable*);
+	static variable* posop(variable*);
+	static variable* negop(variable*);
 };
 #endif
 

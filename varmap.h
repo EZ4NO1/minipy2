@@ -2,20 +2,22 @@
 #define VARMAP_H
 #include "variable.h"
 #define VARMAP_MAX_LENGTH 99
+extern string type_str[8];
+
+
 class varmap{
 public:
-	string ka[VARMAP_MAX_LENGTH];
-	variable* va[VARMAP_MAX_LENGTH] = {0};
+	string key[VARMAP_MAX_LENGTH];
+	variable* pointer[VARMAP_MAX_LENGTH] ;
 	int size=0;
 	varmap();
-	void insert(string,float);
-	void insert(string,string);
-	//void insert(string,string*,int );
-	void insert_copy(string, string);
-	variable* at(string);
-	variable* get(string);
-	bool exsit(string);
-	void print(string);
+	void insert_assign(variable*, variable*);
+	variable* at(variable*);
+	variable* leftat(variable*);
+	bool exsit(variable*);
+	static variable* func(variable*, variable*);
+	static variable* objfunc(variable*, variable*,variable*);
+	static void assign(variable*,variable*);
 	~varmap();
 };
 #endif
