@@ -2,6 +2,7 @@
 #define VARMAP_H
 #include "variable.h"
 #define VARMAP_MAX_LENGTH 99
+
 extern string type_str[8];
 
 
@@ -11,7 +12,7 @@ public:
 	variable* pointer[VARMAP_MAX_LENGTH] ;
 	int size=0;
 	varmap();
-	void insert_assign(variable*, variable*);
+	variable* insert(variable*);
 	variable* at(variable*);
 	variable* leftat(variable*);
 	bool exsit(variable*);

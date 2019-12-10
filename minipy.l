@@ -1,6 +1,6 @@
 %{
-#include "variable.h"
-#define YYSTYPE variable*
+#include "statement.h"
+#define YYSTYPE statement*
 #include "y.tab.h"
 
 /*  any C declaration  */
@@ -24,7 +24,8 @@ real     {number}"."{number}
 				for(int i=0;i<yyleng;i++){
 				n=n*10+(yytext[i]-'0');
 				}
-				yylval=new variable(n);
+				variable* t=new variable(n);
+				yylval=new statement(t);
 //cout<<"int";
 				return INT;
 				
@@ -54,11 +55,19 @@ real     {number}"."{number}
 					fl=fl/10;
 				}
 				//cout<<"real"<<n;
-				yylval=new variable(n);
+				variable* t=new variable(n);
+				yylval=new statement(t)
                 		return REAL;
             }
+for  {
+return FOR;
+}
+in {
+return IN;
+}
 {id}        {
-			    yylval=new variable(string(yytext));
+			    variable* t=new variable(string(yytext));
+				yylval=new statement(t)
                return ID; 
             }
 \"(\\.|[^\\"])*\"	{
@@ -69,8 +78,8 @@ real     {number}"."{number}
 					}
 					chs[yyleng-2]=0;
 					str1=chs;
-					yylval=new variable(str1);
-
+					variable* t=new variable(str1);
+				yylval=new statement(t)
 					return(STRING_LITERAL); /*comments */
 					}
 '(\\.|[^\\'])*'	{
@@ -81,8 +90,8 @@ real     {number}"."{number}
 					}
 					chs[yyleng-2]=0;
 					str1=chs;
-					yylval=new variable(str1);
-
+					variable* t=new variable(str1);
+				   yylval=new statement(t)
 					return(STRING_LITERAL); /*comments */
 					}
 .|\n        {return (yytext[0]); }

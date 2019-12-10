@@ -1,13 +1,7 @@
 %{
    /* definition */
-/*   #include <stdio.h>
-   #include <ctype.h>
-   using namespace std;
-   #include <iostream>
-   #include <string>]
-   #include <map>*/
-#include "varmap.h"
- #define YYSTYPE variable* 
+#include "statement.h"
+ #define YYSTYPE statement*
    #include "lex.yy.c"
    varmap varm;
 void yyerror(char*);
@@ -20,28 +14,84 @@ Start : prompt Lines
       ;
 Lines : Lines  stat '\n' prompt
       | Lines  '\n' prompt 
+	  | Lines loop prompt
       |
       | error '\n'
       ;
-prompt : {cout << "miniPy> ";}
+loop:FOR ID IN add_expr ':' '\n' loopprompt loopbody{
+		statement** l=new statement*[1];
+		l[0]=$2;
+		statement *s=new statement(S_TYPE_INSERT,1,l);
+		statement** l2=new statement*[3];
+		l2[0]=s;
+		l2[1]=$4;
+		l2[2]=$8;
+		$$= new statement(S_TYPE_ASSIGN,3,l2);
+}
+|FOR left_expr IN add_expr ':' '\n' loopprompt loopbody{
+		statement** l2=new statement*[3];
+		l2[0]=$2;
+		l2[1]=$4;
+		l2[2]=$8;
+		$$= new statement(S_TYPE_ASSIGN,3,l2);
+}
+;
+loopprompt:{cout<<"...";}
+;
+loopbody:statements loopprompt '\n'{$$=$1}
+;
+statements:{
+l=new statement*[99];
+$$=new statement(S_TYPE_LIST_OF_S,0,l);}
+|statements assignExpr loopprompt '\n'{
+$1->append($2);
+$$=$1;
+}
+;
+prompt : {cout << ">>> ";}
        ;
 stat  : assignExpr
       |
       ;
 assignExpr:
 		ID '=' add_expr{
-		varm.insert_assign($1,$3);
+		statement** l=new statement*[1];
+		l[0]=$1;
+		statement *s=new statement(S_TYPE_INSERT,1,l);
+		statement** l2=new statement*[2];
+		l2[0]=s;
+		l2[1]=$2;
+		$$= new statement(S_TYPE_ASSIGN,2,l2);
 		}
         |left_expr '=' add_expr{ //add method assign combining insert and change
-		varmap::assign($1,$3);
+		statement** l=new statement*[2];
+		l[0]=$1;
+		l[1]=$2;
+		$$= new statement(S_TYPE_ASSIGN,2,l);
 		}
-      | add_expr {
-	  if ($1!=0) $1->print();
+      | add_expr {//打包成print(add_expr)
+	  statement** l=new statement*[1];
+	  l[0]=$1;
+	  $$=new statement(S_TYPE_PRINT,1,l);
 	  }
       ;
 	  
-left_expr:atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{$$=variable::leftslice($1,$3,$5,$6);}
-        |  atom_expr '[' add_expr ']'{$$=variable::leftat($1,$3);} 
+left_expr:atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{
+	statement** l=new statement*[4];
+	  l[0]=$1;
+	  l[1]=$3;
+	  l[2]=$5;
+	  l[3]=$6;
+	  $$=new statement(S_TYPE_LEFTSLICE,4,l);
+	  $$->varm=varm;
+
+}
+        |  atom_expr '[' add_expr ']'{
+		statement** l=new statement*[2];
+	  l[0]=$1;
+	  l[1]=$3;
+	  $$=new statement(S_TYPE_LEFTAT,2,l);
+		} 
 		;
 number : INT{
     $$=$1;
@@ -51,17 +101,22 @@ number : INT{
 	   }
        ;
 factor : '+' factor{
-		//add method op_pos
-		$$=variable::posop($2);
+		statement** l=new statement*[1];
+	  l[0]=$2;
+	  $$=new statement(S_TYPE_POSOP,1,l);
 }
        | '-' factor{
-cout<<"-"<<endl;
-	   	//add method op_neg
-		$$=variable::negop($2);
+	   	statement** l=new statement*[1];
+	  l[0]=$2;
+	  $$=new statement(S_TYPE_NEGOP,1,l);
 	   }
-       | atom_expr
+       | atom_expr{$$=$1;}
        ; 
-atom  : ID  {$$=varm.at($1);}
+atom  : ID  {
+	statement** l=new statement*[1];
+	  l[0]=$1;
+	  $$=new statement(S_TYPE_LOAD,1,l);
+}
       | STRING_LITERAL {$$=$1;
 		}
 
@@ -70,48 +125,73 @@ atom  : ID  {$$=varm.at($1);}
       ;
 
 
-slice_op :  /*  empty production */{$$=new variable(1);cout<<"slice_op empty"<<endl;}
-		|':'{$$=new variable(1);cout<<"slice_op :"<<endl;}
+slice_op :  /*  empty production */{$$=new statement(new variable(1));}
+		|':'{$$=new statement(new variable(1));}
         | ':' add_expr {$$=$2;}
         ;
-sub_expr:  /*  empty production */{$$=new variable(); cout<<"sub_exper default"<<endl;}
+sub_expr:  /*  empty production */{$$=new statement(new variable());}
         | add_expr{$$=$1;}
         ;        
 atom_expr : atom  {$$=$1;}
-        | atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{$$=variable::slice($1,$3,$5,$6);}
-        | atom_expr  '[' add_expr ']'{$$=variable::at($1,$3);}
-		|func_exper
+        | atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{
+		statement** l=new statement*[4];
+		l[0]=$1;
+		l[1]=$3;
+		l[2]=$5;
+		l[3]=$6;
+		$$=new statement(S_TYPE_SLICE,4,l);
+		}
+        | atom_expr  '[' add_expr ']'{
+		statement** l=new statement*[2];
+		l[0]=$1;
+		l[1]=$3;
+		$$=new statement(S_TYPE_AT,2,l);
+		}
+		|func_exper{$$=$1;}
         ;
 
 func_exper: func_name  '(' List_items ')'{
-			$$=varmap::func($1,$3);
+			statement** l=new statement*[2];
+			l[0]=$1;
+			l[1]=$3;
+			$$=new statement(S_TYPE_FUNC,2,l);
 }
         | func_name   '('  ')'{
 				variable* t=new variable();
 				t->type=TYPE_LIST;
 				t->size=0;
 				t->value=0;
-				$$=varmap::func($1,t);
+				statement *s=new statement(t);
+				statement** l=new statement*[2];
+				l[0]=$1;
+				l[1]=s;
+				$$=new statement(S_TYPE_FUNC,2,l);
 		}
         | atom_expr'.'func_name  '(' List_items ')'{
-			$$=varmap::objfunc($1,$3,$5);
+			statement** l=new statement*[3];
+			l[0]=$1;
+			l[1]=$3;
+			l[2]=$5;
+			$$=new statement(S_TYPE_FUNC,3,l);
 		}
         | atom_expr'.'func_name   '('  ')'{
 			variable* t=new variable();
 				t->type=TYPE_LIST;
 				t->size=0;
 				t->value=0;
-			$$=varmap::objfunc($1,$3,t);
+				statement *s=new statement(t);
+			statement** l=new statement*[3];
+			l[0]=$1;
+			l[1]=$3;
+			l[2]=s;
+			$$=new statement(S_TYPE_FUNC,3,l);
 		}
 		;
 
 func_name:ID{$$=$1;}
 ;
 List  : '[' ']' {
-			$$=new variable();
-			$$->type=TYPE_LIST;
-			$$->size=0;
-			$$->value=0;
+			$$=new statement(S_TYPE_CREATE_LIST,0,0);
 				}
       | '[' List_items opt_comma ']'{
 			$$=$2;
@@ -122,37 +202,52 @@ opt_comma : /*  empty production */{}
           ;
 List_items  
       : add_expr  {
-			variable** l=new variable*;
-			*l=$1;
-			$$=new variable(l,1);
+		statement** l=new statement*[2];
+		l[0]=new statement(S_TYPE_CREATE_LIST,0,0);
+		l[1]=$1;
+		$$=new statement(S_TYPE_APPEND,2,l);
+	
 	  }
       | List_items ',' add_expr{
-	        variable **l = new variable * [$1->size+1];
-			for (int i = 0; i < $1->size; i++) {
-			l[i] = ((variable**)$1->value)[i];
-		}
-		l[$1->size]=$3;
-		$$=new variable(l,$1->size+1);
+	        statement** l=new statement*[2];
+			l[0]=$1;
+			l[1]=$3;
+			$$=new statement(S_TYPE_APPEND,2,l);
 	  } 
       ;
 add_expr : add_expr '+' mul_expr  {//添加add
-				$$=variable::add($1,$3);
+			statement** l=new statement*[2];
+			l[0]=$1;
+			l[1]=$3;
+			$$=new statement(S_TYPE_ADD,2,l);
 			}
 	      |  add_expr '-' mul_expr {//添加sub
-			$$=variable::sub($1,$3);
+			statement** l=new statement*[2];
+			l[0]=$1;
+			l[1]=$3;
+			$$=new statement(S_TYPE_SUB,2,l);
 		  }
 	      |  mul_expr {
 		    $$=$1;
 		  }
         ;
 mul_expr : mul_expr '*' factor{ //add method mul
-$$=variable::mul($1,$3);
+           statement** l=new statement*[2];
+			l[0]=$1;
+			l[1]=$3;
+			$$=new statement(S_TYPE_MUL,2,l);
 		}
         |  mul_expr '/' factor{//add method div
-			$$=variable::div($1,$3);
+			statement** l=new statement*[2];
+			l[0]=$1;
+			l[1]=$3;
+			$$=new statement(S_TYPE_DIV,2,l);
 		}
 	      |  mul_expr '%' factor{//add method mod
-		  $$=variable::mod($1,$3);
+		  statement** l=new statement*[2];
+			l[0]=$1;
+			l[1]=$3;
+			$$=new statement(S_TYPE_MOD,2,l);
 		  }
         |  factor{
 		$$=$1;
