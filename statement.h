@@ -23,6 +23,7 @@
 #define S_TYPE_APPEND 16
 #define S_TYPE_LOAD 17
 #define S_TYPE_INSERT 18
+#define S_TYPE_LISTAPPEND 19
 class statement {
 public:
 	statement** src;

@@ -135,6 +135,10 @@ variable* statement::emit(){
 	if (this->op == S_TYPE_INSERT) {
 		return this->varm->insert(srcvars[0]);
 	}
+	if (this->op==S_TYPE_LISTAPPEND){
+		srcvars[0]->append(srcvars[1]);
+		return srcvars[0];
+	}	
 }
 
 void statement::append(statement* s){

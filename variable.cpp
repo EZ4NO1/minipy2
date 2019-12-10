@@ -708,3 +708,12 @@ variable* variable::negop(variable* var)
         cout<<endl;
         return 0;
 }
+void variable::append(variable *var){
+	variable **l = new variable * [this->size+1];
+	for (int i = 0; i < this->size; i++) {
+		l[i] = ((variable**)this->value)[i];
+	}
+	l[this->size]=var;
+	this->size++;
+	this->value=l;
+}

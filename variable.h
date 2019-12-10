@@ -44,6 +44,7 @@ public:
 	static variable* leftslice(variable*, variable*,variable*, variable*);
 	static variable* posop(variable*);
 	static variable* negop(variable*);
+	void append(variable*);
 };
 #endif
 

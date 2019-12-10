@@ -14,22 +14,22 @@ Start : prompt Lines
       ;
 Lines : Lines  stat '\n' prompt{}
       | Lines  '\n' prompt 
-	  | Lines loop prompt{$2->emit();}
+	  | Lines loop {$2->emit();cout<<"<<<";}
       |
       | error '\n'
       ;
 loop:FOR ID IN add_expr ':' '\n' loopprompt loopbody{
 		statement *s=new statement(S_TYPE_INSERT,$2);
 		s->varm=&varm;
-		$$= new statement(S_TYPE_ASSIGN,s,$4,$8);
+		$$= new statement(S_TYPE_FOR,s,$4,$8);
 }
 |FOR left_expr IN add_expr ':' '\n' loopprompt loopbody{
-		$$= new statement(S_TYPE_ASSIGN,$2,$4,$8);
+		$$= new statement(S_TYPE_FOR,$2,$4,$8);
 }
 ;
 loopprompt:{cout<<"...";}
 ;
-loopbody:statements loopprompt '\n'{$$=$1;}
+loopbody:statements '\n'{$$=$1;}
 ;
 statements:{
 statement** l=new statement*[99];
@@ -113,23 +113,15 @@ func_exper: func_name  '(' List_items ')'{
 			$$=new statement(S_TYPE_FUNC,$1,$3);
 }
         | func_name   '('  ')'{
-				variable* t=new variable();
-				t->type=TYPE_LIST;
-				t->size=0;
-				t->value=0;
-				statement *s=new statement(t);
+				statement *s=new statement(S_TYPE_CREATE_LIST,0,0);
 				$$=new statement(S_TYPE_FUNC,$1,s);
 		}
         | atom_expr'.'func_name  '(' List_items ')'{
-			$$=new statement(S_TYPE_FUNC,$1,$3,$5);
+			$$=new statement(S_TYPE_OBJFUNC,$1,$3,$5);
 		}
         | atom_expr'.'func_name   '('  ')'{
-			variable* t=new variable();
-				t->type=TYPE_LIST;
-				t->size=0;
-				t->value=0;
-				statement *s=new statement(t);
-			$$=new statement(S_TYPE_FUNC,$1,$3,s);
+			statement *s=new statement(S_TYPE_CREATE_LIST,0,0);
+			$$=new statement(S_TYPE_OBJFUNC,$1,$3,s);
 		}
 		;
 
@@ -148,11 +140,11 @@ opt_comma : /*  empty production */{}
 List_items  
       : add_expr  {
 		statement*s=new statement(S_TYPE_CREATE_LIST,0,0);
-		$$=new statement(S_TYPE_APPEND,s,$1);
+		$$=new statement(S_TYPE_LISTAPPEND,s,$1);
 	
 	  }
       | List_items ',' add_expr{
-			$$=new statement(S_TYPE_APPEND,$1,$3);
+			$$=new statement(S_TYPE_LISTAPPEND,$1,$3);
 	  } 
       ;
 add_expr : add_expr '+' mul_expr  {//Ìí¼Óadd
