@@ -47,14 +47,14 @@ void indentation::addline(statement* s){
 		return;
 	}
 	statement *st=0;
-	while(stk.size()>1){
-			if (stk.top()->subspace=s->space){
+	while(!stk.empty()){
+			if (stk.top()->subspace==s->space){
 				merge(s);
 				return;
 			}
 			stk.pop();
 		}
-	if (stk.size()==1){
+	if (stk.empty()){
 		error();
 	}
 }
