@@ -50,7 +50,8 @@ extern int yydebug;
     REAL = 260,
     STRING_LITERAL = 261,
     FOR = 262,
-    IN = 263
+    IN = 263,
+    SPACE = 264
   };
 #endif
 /* Tokens.  */
@@ -60,6 +61,7 @@ extern int yydebug;
 #define STRING_LITERAL 261
 #define FOR 262
 #define IN 263
+#define SPACE 264
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

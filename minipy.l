@@ -20,7 +20,7 @@ real     {number}"."{number}
 [\t]+ 		{
 				yylval=new statement(S_TYPE_SPACE,0,0);
 				yylval->space=yyleng;
-				
+				return SPACE;	
 			}
 {number}    { 
 				int n;

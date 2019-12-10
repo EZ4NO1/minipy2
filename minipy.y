@@ -11,16 +11,18 @@ void yyerror(char*);
 
 
 %%
-Start : Lines{cout<<">>>";}
+Start :startprompt Lines
       ;
-Lines : Lines Line '\n'{ind.addline($2);}
+startprompt:{cout<<">>>";}
+	   ;
+Lines : Lines Line '\n'{ind.addline($2);ind.prompt();}
 	  |
 	  |error '\n'{cout<<">>>";}
 		
 Line  :SPACE state{$$=$2;$$->space=$1->space;}
 	  |state{$$=$1;$$->space=0;}
-	  |SPACE{$$=new(S_TYPE_NOP,0,0);$$->space=$1->space;}
-	  |{$$=new(S_TYPE_NOP,0,0);$$->space=0;}
+	  |SPACE{$$=new statement(S_TYPE_NOP,0,0);$$->space=$1->space;}
+	  |{$$=new statement(S_TYPE_NOP,0,0);$$->space=0;}
 	  ;
 
 
