@@ -8,6 +8,42 @@ statement::statement(variable* p){
 	this->op = S_TYPE_ASVAR;
 	this->srcvar = p;
 }
+statement::statement(int op,statement*s1){
+	statement**l=new statement*[1];
+	l[0]=s1;
+	this->op = op;
+	this->srcnum =1;
+	this->src = l;
+}
+statement::statement(int op,statement*s1,statement*s2){
+	statement**l=new statement*[2];
+	l[0]=s1;
+	l[1]=s2;
+	this->op = op;
+	this->srcnum = 2;
+	this->src = l;
+}
+statement::statement(int op,statement*s1,statement*s2,statement*s3){
+	statement**l=new statement*[3];
+	l[0]=s1;
+	l[1]=s2;
+	l[2]=s3;
+	this->op = op;
+	this->srcnum = 3;
+	this->src = l;
+}
+statement::statement(int op,statement*s1,statement*s2,statement*s3,statement*s4){
+	statement**l=new statement*[4];
+	l[0]=s1;
+	l[1]=s2;
+	l[2]=s3;
+	l[3]=s4;
+	this->op = op;
+	this->srcnum = 4;
+	this->src = l;
+}
+
+
 variable* statement::emit(){
 	if (this->op == S_TYPE_FOR) {
 		variable*list=this->src[1]->emit();
@@ -17,8 +53,8 @@ variable* statement::emit(){
 				statement** l = new statement * [2];
 				l[0] = src[0];
 				l[1] = new statement(t);
-				new statement(S_TYPE_ASSIGN, l, 2)->emit();
-				src[2]->emit;
+				(new statement(S_TYPE_ASSIGN, 2,l))->emit();
+				this->src[2]->emit();
 			}
 		}
 		return 0;
@@ -29,6 +65,7 @@ variable* statement::emit(){
 	variable** srcvars = new variable * [this->srcnum];
 	for (int i = 0; i < this->srcnum; i++) {
 		srcvars[i]=this->src[i]->emit();
+		if (!srcvars[i]) return 0;
 	}
 	if (this->op == S_TYPE_LIST_OF_S) {
 		return 0;

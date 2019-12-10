@@ -6,42 +6,33 @@
    varmap varm;
 void yyerror(char*);
 %}
-%token ID INT REAL STRING_LITERAL
+%token ID INT REAL STRING_LITERAL FOR IN
 
 
 %%
 Start : prompt Lines
       ;
-Lines : Lines  stat '\n' prompt
+Lines : Lines  stat '\n' prompt{}
       | Lines  '\n' prompt 
-	  | Lines loop prompt
+	  | Lines loop prompt{$2->emit();}
       |
       | error '\n'
       ;
 loop:FOR ID IN add_expr ':' '\n' loopprompt loopbody{
-		statement** l=new statement*[1];
-		l[0]=$2;
-		statement *s=new statement(S_TYPE_INSERT,1,l);
-		statement** l2=new statement*[3];
-		l2[0]=s;
-		l2[1]=$4;
-		l2[2]=$8;
-		$$= new statement(S_TYPE_ASSIGN,3,l2);
+		statement *s=new statement(S_TYPE_INSERT,$2);
+		s->varm=&varm;
+		$$= new statement(S_TYPE_ASSIGN,s,$4,$8);
 }
 |FOR left_expr IN add_expr ':' '\n' loopprompt loopbody{
-		statement** l2=new statement*[3];
-		l2[0]=$2;
-		l2[1]=$4;
-		l2[2]=$8;
-		$$= new statement(S_TYPE_ASSIGN,3,l2);
+		$$= new statement(S_TYPE_ASSIGN,$2,$4,$8);
 }
 ;
 loopprompt:{cout<<"...";}
 ;
-loopbody:statements loopprompt '\n'{$$=$1}
+loopbody:statements loopprompt '\n'{$$=$1;}
 ;
 statements:{
-l=new statement*[99];
+statement** l=new statement*[99];
 $$=new statement(S_TYPE_LIST_OF_S,0,l);}
 |statements assignExpr loopprompt '\n'{
 $1->append($2);
@@ -50,47 +41,28 @@ $$=$1;
 ;
 prompt : {cout << ">>> ";}
        ;
-stat  : assignExpr
-      |
+stat  : assignExpr{$1->emit();}
       ;
 assignExpr:
 		ID '=' add_expr{
-		statement** l=new statement*[1];
-		l[0]=$1;
-		statement *s=new statement(S_TYPE_INSERT,1,l);
-		statement** l2=new statement*[2];
-		l2[0]=s;
-		l2[1]=$2;
-		$$= new statement(S_TYPE_ASSIGN,2,l2);
+		statement *s=new statement(S_TYPE_INSERT,$1);
+s->varm=&varm;
+		$$= new statement(S_TYPE_ASSIGN,s,$3);
 		}
         |left_expr '=' add_expr{ //add method assign combining insert and change
-		statement** l=new statement*[2];
-		l[0]=$1;
-		l[1]=$2;
-		$$= new statement(S_TYPE_ASSIGN,2,l);
+		$$= new statement(S_TYPE_ASSIGN,$1,$3);
 		}
       | add_expr {//打包成print(add_expr)
-	  statement** l=new statement*[1];
-	  l[0]=$1;
-	  $$=new statement(S_TYPE_PRINT,1,l);
+	  $$=new statement(S_TYPE_PRINT,$1);
 	  }
       ;
 	  
 left_expr:atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{
-	statement** l=new statement*[4];
-	  l[0]=$1;
-	  l[1]=$3;
-	  l[2]=$5;
-	  l[3]=$6;
-	  $$=new statement(S_TYPE_LEFTSLICE,4,l);
-	  $$->varm=varm;
+	  $$=new statement(S_TYPE_LEFTSLICE,$1,$3,$5,$6);
 
 }
         |  atom_expr '[' add_expr ']'{
-		statement** l=new statement*[2];
-	  l[0]=$1;
-	  l[1]=$3;
-	  $$=new statement(S_TYPE_LEFTAT,2,l);
+	  $$=new statement(S_TYPE_LEFTAT,$1,$3);
 		} 
 		;
 number : INT{
@@ -101,21 +73,16 @@ number : INT{
 	   }
        ;
 factor : '+' factor{
-		statement** l=new statement*[1];
-	  l[0]=$2;
-	  $$=new statement(S_TYPE_POSOP,1,l);
+	  $$=new statement(S_TYPE_POSOP,$2);
 }
        | '-' factor{
-	   	statement** l=new statement*[1];
-	  l[0]=$2;
-	  $$=new statement(S_TYPE_NEGOP,1,l);
+	  $$=new statement(S_TYPE_NEGOP,$2);
 	   }
        | atom_expr{$$=$1;}
        ; 
 atom  : ID  {
-	statement** l=new statement*[1];
-	  l[0]=$1;
-	  $$=new statement(S_TYPE_LOAD,1,l);
+	  $$=new statement(S_TYPE_LOAD,$1);
+          $$->varm=&varm;
 }
       | STRING_LITERAL {$$=$1;
 		}
@@ -134,27 +101,16 @@ sub_expr:  /*  empty production */{$$=new statement(new variable());}
         ;        
 atom_expr : atom  {$$=$1;}
         | atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{
-		statement** l=new statement*[4];
-		l[0]=$1;
-		l[1]=$3;
-		l[2]=$5;
-		l[3]=$6;
-		$$=new statement(S_TYPE_SLICE,4,l);
+		$$=new statement(S_TYPE_SLICE,$1,$3,$5,$6);
 		}
         | atom_expr  '[' add_expr ']'{
-		statement** l=new statement*[2];
-		l[0]=$1;
-		l[1]=$3;
-		$$=new statement(S_TYPE_AT,2,l);
+		$$=new statement(S_TYPE_AT,$1,$3);
 		}
 		|func_exper{$$=$1;}
         ;
 
 func_exper: func_name  '(' List_items ')'{
-			statement** l=new statement*[2];
-			l[0]=$1;
-			l[1]=$3;
-			$$=new statement(S_TYPE_FUNC,2,l);
+			$$=new statement(S_TYPE_FUNC,$1,$3);
 }
         | func_name   '('  ')'{
 				variable* t=new variable();
@@ -162,17 +118,10 @@ func_exper: func_name  '(' List_items ')'{
 				t->size=0;
 				t->value=0;
 				statement *s=new statement(t);
-				statement** l=new statement*[2];
-				l[0]=$1;
-				l[1]=s;
-				$$=new statement(S_TYPE_FUNC,2,l);
+				$$=new statement(S_TYPE_FUNC,$1,s);
 		}
         | atom_expr'.'func_name  '(' List_items ')'{
-			statement** l=new statement*[3];
-			l[0]=$1;
-			l[1]=$3;
-			l[2]=$5;
-			$$=new statement(S_TYPE_FUNC,3,l);
+			$$=new statement(S_TYPE_FUNC,$1,$3,$5);
 		}
         | atom_expr'.'func_name   '('  ')'{
 			variable* t=new variable();
@@ -180,11 +129,7 @@ func_exper: func_name  '(' List_items ')'{
 				t->size=0;
 				t->value=0;
 				statement *s=new statement(t);
-			statement** l=new statement*[3];
-			l[0]=$1;
-			l[1]=$3;
-			l[2]=s;
-			$$=new statement(S_TYPE_FUNC,3,l);
+			$$=new statement(S_TYPE_FUNC,$1,$3,s);
 		}
 		;
 
@@ -202,52 +147,32 @@ opt_comma : /*  empty production */{}
           ;
 List_items  
       : add_expr  {
-		statement** l=new statement*[2];
-		l[0]=new statement(S_TYPE_CREATE_LIST,0,0);
-		l[1]=$1;
-		$$=new statement(S_TYPE_APPEND,2,l);
+		statement*s=new statement(S_TYPE_CREATE_LIST,0,0);
+		$$=new statement(S_TYPE_APPEND,s,$1);
 	
 	  }
       | List_items ',' add_expr{
-	        statement** l=new statement*[2];
-			l[0]=$1;
-			l[1]=$3;
-			$$=new statement(S_TYPE_APPEND,2,l);
+			$$=new statement(S_TYPE_APPEND,$1,$3);
 	  } 
       ;
 add_expr : add_expr '+' mul_expr  {//添加add
-			statement** l=new statement*[2];
-			l[0]=$1;
-			l[1]=$3;
-			$$=new statement(S_TYPE_ADD,2,l);
+			$$=new statement(S_TYPE_ADD,$1,$3);
 			}
 	      |  add_expr '-' mul_expr {//添加sub
-			statement** l=new statement*[2];
-			l[0]=$1;
-			l[1]=$3;
-			$$=new statement(S_TYPE_SUB,2,l);
+			$$=new statement(S_TYPE_SUB,$1,$3);
 		  }
 	      |  mul_expr {
 		    $$=$1;
 		  }
         ;
 mul_expr : mul_expr '*' factor{ //add method mul
-           statement** l=new statement*[2];
-			l[0]=$1;
-			l[1]=$3;
-			$$=new statement(S_TYPE_MUL,2,l);
+			$$=new statement(S_TYPE_MUL,$1,$3);
 		}
         |  mul_expr '/' factor{//add method div
-			statement** l=new statement*[2];
-			l[0]=$1;
-			l[1]=$3;
-			$$=new statement(S_TYPE_DIV,2,l);
+			$$=new statement(S_TYPE_DIV,$1,$3);
 		}
 	      |  mul_expr '%' factor{//add method mod
-		  statement** l=new statement*[2];
-			l[0]=$1;
-			l[1]=$3;
-			$$=new statement(S_TYPE_MOD,2,l);
+			$$=new statement(S_TYPE_MOD,$1,$3);
 		  }
         |  factor{
 		$$=$1;

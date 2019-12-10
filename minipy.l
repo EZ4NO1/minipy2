@@ -56,7 +56,7 @@ real     {number}"."{number}
 				}
 				//cout<<"real"<<n;
 				variable* t=new variable(n);
-				yylval=new statement(t)
+				yylval=new statement(t);
                 		return REAL;
             }
 for  {
@@ -67,7 +67,7 @@ return IN;
 }
 {id}        {
 			    variable* t=new variable(string(yytext));
-				yylval=new statement(t)
+				yylval=new statement(t);
                return ID; 
             }
 \"(\\.|[^\\"])*\"	{
@@ -79,7 +79,7 @@ return IN;
 					chs[yyleng-2]=0;
 					str1=chs;
 					variable* t=new variable(str1);
-				yylval=new statement(t)
+				yylval=new statement(t);
 					return(STRING_LITERAL); /*comments */
 					}
 '(\\.|[^\\'])*'	{
@@ -91,7 +91,7 @@ return IN;
 					chs[yyleng-2]=0;
 					str1=chs;
 					variable* t=new variable(str1);
-				   yylval=new statement(t)
+				   yylval=new statement(t);
 					return(STRING_LITERAL); /*comments */
 					}
 .|\n        {return (yytext[0]); }

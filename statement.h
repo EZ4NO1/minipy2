@@ -31,6 +31,10 @@ public:
 	int op;
 	int srcnum;
 	statement(int,int,statement**);
+	statement(int,statement*);
+	statement(int,statement*,statement*);
+	statement(int,statement*,statement*,statement*);
+	statement(int,statement*,statement*,statement*,statement*);
 	statement(variable*);
 	variable* emit();
 	void append(statement*);
