@@ -132,7 +132,18 @@ List  : '[' ']' {
 				}
       | '[' List_items opt_comma ']'{
 			$$=$2;
-	  } 
+	  }
+      | '['add_expr FOR ID IN add_expr ']'{
+	statement *s=new statement(S_TYPE_INSERT,$4);
+	s->varm=&varm;
+	$$=new statement(S_TYPE_LISTFOR,$2,s,$6);
+
+}	 
+      | '['add_expr FOR left_expr IN add_expr ']'{
+	$$=new statement(S_TYPE_LISTFOR,$2,$4,$6);
+
+}    
+
       ;
 opt_comma : /*  empty production */{}
           | ','{}

@@ -24,6 +24,7 @@
 #define S_TYPE_LOAD 17
 #define S_TYPE_INSERT 18
 #define S_TYPE_LISTAPPEND 19
+#define S_TYPE_LISTFOR 20
 class statement {
 public:
 	statement** src;

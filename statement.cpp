@@ -45,6 +45,16 @@ statement::statement(int op,statement*s1,statement*s2,statement*s3,statement*s4)
 
 
 variable* statement::emit(){
+	if (this->op==S_TYPE_LISTFOR){
+	 statement* s1=new statement(S_TYPE_CREATE_LIST,(int)0,0);
+	variable *v=s1->emit();
+	statement *s=new statement(v);
+        statement *s2=new statement(S_TYPE_LISTAPPEND,s,src[0]);
+        statement *s3=new statement(S_TYPE_FOR,src[1],src[2],s2);
+	
+	s3->emit();
+	return v;
+	}
 	if (this->op == S_TYPE_FOR) {
 		variable*list=this->src[1]->emit();
 		if (list->type == TYPE_LIST) {
