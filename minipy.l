@@ -2,7 +2,6 @@
 #include "statement.h"
 #define YYSTYPE statement*
 #include "y.tab.h"
-
 /*  any C declaration  */
 %}
 
@@ -17,7 +16,12 @@ id       {letter}({letter}|{digit})*
 real     {number}"."{number}
 
 %%
-[ \t]+      {/*do nothing , just skip */}
+[ ]+      {/*do nothing , just skip */}
+[\t]+ 		{
+				yylval=new statement(S_TYPE_SPACE,0,0);
+				yylval->space=yyleng;
+				
+			}
 {number}    { 
 				int n;
 				n=0;

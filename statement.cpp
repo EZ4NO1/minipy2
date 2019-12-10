@@ -45,6 +45,9 @@ statement::statement(int op,statement*s1,statement*s2,statement*s3,statement*s4)
 
 
 variable* statement::emit(){
+	if (this->op==S_TYPE_NOP){
+		return 0;
+	}
 	if (this->op==S_TYPE_LISTFOR){
 	 statement* s1=new statement(S_TYPE_CREATE_LIST,(int)0,0);
 	variable *v=s1->emit();

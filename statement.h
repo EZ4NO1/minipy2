@@ -25,6 +25,8 @@
 #define S_TYPE_INSERT 18
 #define S_TYPE_LISTAPPEND 19
 #define S_TYPE_LISTFOR 20
+#define S_TYPE_NOP 21
+#define S_TYPE_SPACE 22
 class statement {
 public:
 	statement** src;
@@ -32,6 +34,8 @@ public:
 	varmap* varm;
 	int op;
 	int srcnum;
+	int space=-1;
+	int subspace=-1;
 	statement(int,int,statement**);
 	statement(int,statement*);
 	statement(int,statement*,statement*);

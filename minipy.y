@@ -1,61 +1,53 @@
 %{
    /* definition */
-#include "statement.h"
+#include "indentation.h"
  #define YYSTYPE statement*
    #include "lex.yy.c"
    varmap varm;
+   indentation ind;
 void yyerror(char*);
 %}
-%token ID INT REAL STRING_LITERAL FOR IN
+%token ID INT REAL STRING_LITERAL FOR IN SPACE
 
 
 %%
-Start : prompt Lines
+Start : Lines{cout<<">>>";}
       ;
-Lines : Lines  stat '\n' prompt{}
-      | Lines  '\n' prompt 
-	  | Lines loop {$2->emit();cout<<"<<<";}
-      |
-      | error '\n'
-      ;
-loop:FOR ID IN add_expr ':' '\n' loopprompt loopbody{
-		statement *s=new statement(S_TYPE_INSERT,$2);
-		s->varm=&varm;
-		$$= new statement(S_TYPE_FOR,s,$4,$8);
-}
-|FOR left_expr IN add_expr ':' '\n' loopprompt loopbody{
-		$$= new statement(S_TYPE_FOR,$2,$4,$8);
-}
+Lines : Lines Line '\n'{ind.addline($2);}
+	  |
+	  |error '\n'{cout<<">>>";}
+		
+Line  :SPACE state{$$=$2;$$->space=$1->space;}
+	  |state{$$=$1;$$->space=0;}
+	  |SPACE{$$=new(S_TYPE_NOP,0,0);$$->space=$1->space;}
+	  |{$$=new(S_TYPE_NOP,0,0);$$->space=0;}
+	  ;
+
+
+state:ID '=' add_expr{
+				statement *s=new statement(S_TYPE_INSERT,$1);
+				s->varm=&varm;
+				$$= new statement(S_TYPE_ASSIGN,s,$3);
+				}
+           |left_expr '=' add_expr{ //add method assign combining insert and change
+				$$= new statement(S_TYPE_ASSIGN,$1,$3);
+				}
+		   | add_expr {//打包成print(add_expr)
+				$$=new statement(S_TYPE_PRINT,$1);
+				}
+		   | FOR ID IN add_expr ':'{
+				statement *s=new statement(S_TYPE_INSERT,$2);
+				s->varm=&varm;
+				statement** l=new statement*[99];
+				statement *s1=new statement(S_TYPE_LIST_OF_S,0,l);
+				$$= new statement(S_TYPE_FOR,s,$4,s1);
+				}
+			   |FOR left_expr IN add_expr ':'{
+				statement** l=new statement*[99];
+				statement *s1=new statement(S_TYPE_LIST_OF_S,0,l);
+				$$= new statement(S_TYPE_FOR,$2,$4,s1);
+				}
 ;
-loopprompt:{cout<<"...";}
-;
-loopbody:statements '\n'{$$=$1;}
-;
-statements:{
-statement** l=new statement*[99];
-$$=new statement(S_TYPE_LIST_OF_S,0,l);}
-|statements assignExpr loopprompt '\n'{
-$1->append($2);
-$$=$1;
-}
-;
-prompt : {cout << ">>> ";}
-       ;
-stat  : assignExpr{$1->emit();}
-      ;
-assignExpr:
-		ID '=' add_expr{
-		statement *s=new statement(S_TYPE_INSERT,$1);
-s->varm=&varm;
-		$$= new statement(S_TYPE_ASSIGN,s,$3);
-		}
-        |left_expr '=' add_expr{ //add method assign combining insert and change
-		$$= new statement(S_TYPE_ASSIGN,$1,$3);
-		}
-      | add_expr {//打包成print(add_expr)
-	  $$=new statement(S_TYPE_PRINT,$1);
-	  }
-      ;
 	  
 left_expr:atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{
 	  $$=new statement(S_TYPE_LEFTSLICE,$1,$3,$5,$6);
