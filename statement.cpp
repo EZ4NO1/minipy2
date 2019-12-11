@@ -76,11 +76,14 @@ variable* statement::emit(){
 	 statement* s1=new statement(S_TYPE_CREATE_LIST,(int)0,0);
 	variable *v=s1->emit();
 	if (!v) return 0;
+	statement* list_loop=src[1];
+	for (int i=0;i<list_loop->srcnum-1;i++){
+		list_loop->src[i]->src[2]=list_loop->src[i+1];
+	}
 	statement *s=new statement(v);
         statement *s2=new statement(S_TYPE_LISTAPPEND,s,src[0]);
-        statement *s3=new statement(S_TYPE_FOR,src[1],src[2],s2);
-	
-	variable *v1=s3->emit();
+	list_loop->src[list_loop->srcnum-1]->src[2]=s2;
+	variable *v1=list_loop->src[0]->emit();
 	if (!v1) return 0;
 	return v;
 	}

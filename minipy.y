@@ -144,16 +144,36 @@ List  : '[' ']' {
       | '[' List_items opt_comma ']'{
 			$$=$2;
 	  }
-      | '['add_expr FOR ID IN add_expr ']'{
-	statement *s=new statement(S_TYPE_INSERT,$4);
-	s->varm=&varm;
-	$$=new statement(S_TYPE_LISTFOR,$2,s,$6);
+      | '['add_expr list_for ']'{
+	$$=new statement(S_TYPE_LISTFOR,$2,$3);
 
 }	 
-      | '['add_expr FOR left_expr IN add_expr ']'{
-	$$=new statement(S_TYPE_LISTFOR,$2,$4,$6);
-
-}    
+;
+list_for:list_for FOR ID IN add_expr{
+	$$=$1;
+	statement *s=new statement(S_TYPE_INSERT,$3);
+	s->varm=&varm;
+	statement **l=new statement*[99];
+	$$->append(new statement(S_TYPE_FOR,s,$5,0));
+}
+       |list_for FOR left_expr IN add_expr{
+	$$=$1;
+	statement **l=new statement*[99];
+	$$->append(new statement(S_TYPE_FOR,$3,$5,0));
+	
+}
+	|FOR ID IN add_expr{
+	statement *s=new statement(S_TYPE_INSERT,$2);
+	s->varm=&varm;
+	statement **l=new statement*[99];
+	$$=new statement(S_TYPE_LIST_OF_S,0,l);
+	$$->append(new statement(S_TYPE_FOR,s,$4,0));
+}
+	|FOR left_expr IN add_expr{
+	statement **l=new statement*[99];
+	$$=new statement(S_TYPE_LIST_OF_S,0,l);
+	$$->append(new statement(S_TYPE_FOR,$2,$4,0));
+}	
 
       ;
 opt_comma : /*  empty production */{}
@@ -206,7 +226,8 @@ int main()
 
 void yyerror(char *s)
 {
-cout<<s<<endl; 
+cout<<s<<endl;
+ind.init();
 return;
 }
 
