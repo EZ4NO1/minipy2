@@ -46,6 +46,7 @@ statement::statement(int op,statement*s1,statement*s2,statement*s3,statement*s4)
 
 variable* statement::emit(){
 	if (this->op==S_TYPE_WHILE){
+		cout<<"here";
 		while(*((bool*)src[0]->emit()->value)){
 			src[1]->emit();
 		}
