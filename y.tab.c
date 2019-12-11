@@ -449,13 +449,13 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    14,    14,    16,    18,    19,    20,    22,    23,    24,
-      25,    29,    34,    37,    40,    47,    52,    57,    59,    62,
-      65,    66,    69,    73,    77,    80,    84,    87,    90,    92,
-      96,    99,   100,   104,   105,   106,   108,   109,   111,   112,
-     115,   118,   119,   122,   125,   129,   132,   138,   140,   143,
-     146,   152,   158,   159,   162,   167,   171,   174,   177,   180,
-     182,   185,   188,   191,   194
+       0,    14,    14,    16,    19,    20,    21,    23,    24,    25,
+      26,    30,    35,    38,    41,    48,    53,    58,    60,    63,
+      66,    67,    70,    74,    78,    81,    85,    88,    91,    93,
+      97,   100,   101,   105,   106,   107,   109,   110,   112,   113,
+     116,   119,   120,   123,   126,   130,   133,   139,   141,   144,
+     147,   153,   159,   160,   163,   168,   172,   175,   178,   181,
+     183,   186,   189,   192,   195
 };
 #endif
 
@@ -1329,74 +1329,75 @@ yyreduce:
     {
         case 3:
 #line 16 "minipy.y" /* yacc.c:1646  */
-    {cout<<">>>";}
-#line 1334 "y.tab.c" /* yacc.c:1646  */
+    {cout<<"Minipy_v2 [Copyright:gy991007,alicemare,ling0-cell@github.com]"<<endl<<">>>";
+}
+#line 1335 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 18 "minipy.y" /* yacc.c:1646  */
+#line 19 "minipy.y" /* yacc.c:1646  */
     {ind.addline((yyvsp[-1]));ind.prompt();}
-#line 1340 "y.tab.c" /* yacc.c:1646  */
+#line 1341 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 20 "minipy.y" /* yacc.c:1646  */
+#line 21 "minipy.y" /* yacc.c:1646  */
     {cout<<">>>";}
-#line 1346 "y.tab.c" /* yacc.c:1646  */
+#line 1347 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 22 "minipy.y" /* yacc.c:1646  */
+#line 23 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);(yyval)->space=(yyvsp[-1])->space;}
-#line 1352 "y.tab.c" /* yacc.c:1646  */
+#line 1353 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 23 "minipy.y" /* yacc.c:1646  */
+#line 24 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);(yyval)->space=0;}
-#line 1358 "y.tab.c" /* yacc.c:1646  */
+#line 1359 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 24 "minipy.y" /* yacc.c:1646  */
+#line 25 "minipy.y" /* yacc.c:1646  */
     {(yyval)=new statement(S_TYPE_NOP,0,0);(yyval)->space=(yyvsp[0])->space;}
-#line 1364 "y.tab.c" /* yacc.c:1646  */
+#line 1365 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 25 "minipy.y" /* yacc.c:1646  */
+#line 26 "minipy.y" /* yacc.c:1646  */
     {(yyval)=new statement(S_TYPE_NOP,0,0);(yyval)->space=0;}
-#line 1370 "y.tab.c" /* yacc.c:1646  */
+#line 1371 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 29 "minipy.y" /* yacc.c:1646  */
+#line 30 "minipy.y" /* yacc.c:1646  */
     {
 				statement *s=new statement(S_TYPE_INSERT,(yyvsp[-2]));
 				s->varm=&varm;
 				(yyval)= new statement(S_TYPE_ASSIGN,s,(yyvsp[0]));
 				}
-#line 1380 "y.tab.c" /* yacc.c:1646  */
+#line 1381 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 34 "minipy.y" /* yacc.c:1646  */
+#line 35 "minipy.y" /* yacc.c:1646  */
     { //add method assign combining insert and change
 				(yyval)= new statement(S_TYPE_ASSIGN,(yyvsp[-2]),(yyvsp[0]));
 				}
-#line 1388 "y.tab.c" /* yacc.c:1646  */
+#line 1389 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 37 "minipy.y" /* yacc.c:1646  */
+#line 38 "minipy.y" /* yacc.c:1646  */
     {//打包成print(add_expr)
 				(yyval)=new statement(S_TYPE_PRINT,(yyvsp[0]));
 				}
-#line 1396 "y.tab.c" /* yacc.c:1646  */
+#line 1397 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 40 "minipy.y" /* yacc.c:1646  */
+#line 41 "minipy.y" /* yacc.c:1646  */
     {
 				statement *s=new statement(S_TYPE_INSERT,(yyvsp[-3]));
 				s->varm=&varm;
@@ -1404,387 +1405,387 @@ yyreduce:
 				statement *s1=new statement(S_TYPE_LIST_OF_S,0,l);
 				(yyval)= new statement(S_TYPE_FOR,s,(yyvsp[-1]),s1);
 				}
-#line 1408 "y.tab.c" /* yacc.c:1646  */
+#line 1409 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 47 "minipy.y" /* yacc.c:1646  */
+#line 48 "minipy.y" /* yacc.c:1646  */
     {
 				statement** l=new statement*[99];
 				statement *s1=new statement(S_TYPE_LIST_OF_S,0,l);
 				(yyval)= new statement(S_TYPE_FOR,(yyvsp[-3]),(yyvsp[-1]),s1);
 				}
-#line 1418 "y.tab.c" /* yacc.c:1646  */
+#line 1419 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 52 "minipy.y" /* yacc.c:1646  */
+#line 53 "minipy.y" /* yacc.c:1646  */
     {
 	statement** l=new statement*[99];
 	statement *s1=new statement(S_TYPE_LIST_OF_S,0,l);
 	(yyval)= new statement(S_TYPE_WHILE,(yyvsp[-1]),s1);
 }
-#line 1428 "y.tab.c" /* yacc.c:1646  */
+#line 1429 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 57 "minipy.y" /* yacc.c:1646  */
+#line 58 "minipy.y" /* yacc.c:1646  */
     {
 }
-#line 1435 "y.tab.c" /* yacc.c:1646  */
+#line 1436 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 59 "minipy.y" /* yacc.c:1646  */
+#line 60 "minipy.y" /* yacc.c:1646  */
     {
 }
-#line 1442 "y.tab.c" /* yacc.c:1646  */
+#line 1443 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 62 "minipy.y" /* yacc.c:1646  */
+#line 63 "minipy.y" /* yacc.c:1646  */
     {
 		(yyval)=new statement(S_TYPE_ASBOOL,(yyvsp[0]));}
-#line 1449 "y.tab.c" /* yacc.c:1646  */
+#line 1450 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 65 "minipy.y" /* yacc.c:1646  */
+#line 66 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1455 "y.tab.c" /* yacc.c:1646  */
+#line 1456 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 66 "minipy.y" /* yacc.c:1646  */
+#line 67 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1461 "y.tab.c" /* yacc.c:1646  */
+#line 1462 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 69 "minipy.y" /* yacc.c:1646  */
+#line 70 "minipy.y" /* yacc.c:1646  */
     {
 	  (yyval)=new statement(S_TYPE_LEFTSLICE,(yyvsp[-6]),(yyvsp[-4]),(yyvsp[-2]),(yyvsp[-1]));
 
 }
-#line 1470 "y.tab.c" /* yacc.c:1646  */
+#line 1471 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 73 "minipy.y" /* yacc.c:1646  */
+#line 74 "minipy.y" /* yacc.c:1646  */
     {
 	  (yyval)=new statement(S_TYPE_LEFTAT,(yyvsp[-3]),(yyvsp[-1]));
 		}
-#line 1478 "y.tab.c" /* yacc.c:1646  */
+#line 1479 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 77 "minipy.y" /* yacc.c:1646  */
+#line 78 "minipy.y" /* yacc.c:1646  */
     {
     (yyval)=(yyvsp[0]);
 }
-#line 1486 "y.tab.c" /* yacc.c:1646  */
+#line 1487 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 80 "minipy.y" /* yacc.c:1646  */
+#line 81 "minipy.y" /* yacc.c:1646  */
     {
 	   (yyval)=(yyvsp[0]);
 	   }
-#line 1494 "y.tab.c" /* yacc.c:1646  */
+#line 1495 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 84 "minipy.y" /* yacc.c:1646  */
+#line 85 "minipy.y" /* yacc.c:1646  */
     {
 	  (yyval)=new statement(S_TYPE_POSOP,(yyvsp[0]));
 }
-#line 1502 "y.tab.c" /* yacc.c:1646  */
+#line 1503 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 87 "minipy.y" /* yacc.c:1646  */
+#line 88 "minipy.y" /* yacc.c:1646  */
     {
 	  (yyval)=new statement(S_TYPE_NEGOP,(yyvsp[0]));
 	   }
-#line 1510 "y.tab.c" /* yacc.c:1646  */
+#line 1511 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 90 "minipy.y" /* yacc.c:1646  */
+#line 91 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1516 "y.tab.c" /* yacc.c:1646  */
+#line 1517 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 92 "minipy.y" /* yacc.c:1646  */
+#line 93 "minipy.y" /* yacc.c:1646  */
     {
 	  (yyval)=new statement(S_TYPE_LOAD,(yyvsp[0]));
           (yyval)->varm=&varm;
 }
-#line 1525 "y.tab.c" /* yacc.c:1646  */
+#line 1526 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 96 "minipy.y" /* yacc.c:1646  */
+#line 97 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);
 		}
-#line 1532 "y.tab.c" /* yacc.c:1646  */
+#line 1533 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 99 "minipy.y" /* yacc.c:1646  */
+#line 100 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1538 "y.tab.c" /* yacc.c:1646  */
+#line 1539 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 100 "minipy.y" /* yacc.c:1646  */
+#line 101 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1544 "y.tab.c" /* yacc.c:1646  */
+#line 1545 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 104 "minipy.y" /* yacc.c:1646  */
+#line 105 "minipy.y" /* yacc.c:1646  */
     {(yyval)=new statement(new variable(1));}
-#line 1550 "y.tab.c" /* yacc.c:1646  */
+#line 1551 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 105 "minipy.y" /* yacc.c:1646  */
+#line 106 "minipy.y" /* yacc.c:1646  */
     {(yyval)=new statement(new variable(1));}
-#line 1556 "y.tab.c" /* yacc.c:1646  */
+#line 1557 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 106 "minipy.y" /* yacc.c:1646  */
+#line 107 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1562 "y.tab.c" /* yacc.c:1646  */
+#line 1563 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 108 "minipy.y" /* yacc.c:1646  */
+#line 109 "minipy.y" /* yacc.c:1646  */
     {(yyval)=new statement(new variable());}
-#line 1568 "y.tab.c" /* yacc.c:1646  */
+#line 1569 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 109 "minipy.y" /* yacc.c:1646  */
+#line 110 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1574 "y.tab.c" /* yacc.c:1646  */
+#line 1575 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 111 "minipy.y" /* yacc.c:1646  */
+#line 112 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1580 "y.tab.c" /* yacc.c:1646  */
+#line 1581 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 112 "minipy.y" /* yacc.c:1646  */
+#line 113 "minipy.y" /* yacc.c:1646  */
     {
 		(yyval)=new statement(S_TYPE_SLICE,(yyvsp[-6]),(yyvsp[-4]),(yyvsp[-2]),(yyvsp[-1]));
 		}
-#line 1588 "y.tab.c" /* yacc.c:1646  */
+#line 1589 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 115 "minipy.y" /* yacc.c:1646  */
+#line 116 "minipy.y" /* yacc.c:1646  */
     {
 		(yyval)=new statement(S_TYPE_AT,(yyvsp[-3]),(yyvsp[-1]));
 		}
-#line 1596 "y.tab.c" /* yacc.c:1646  */
+#line 1597 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 118 "minipy.y" /* yacc.c:1646  */
+#line 119 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1602 "y.tab.c" /* yacc.c:1646  */
+#line 1603 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 119 "minipy.y" /* yacc.c:1646  */
+#line 120 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[-2]);}
-#line 1608 "y.tab.c" /* yacc.c:1646  */
+#line 1609 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 122 "minipy.y" /* yacc.c:1646  */
+#line 123 "minipy.y" /* yacc.c:1646  */
     {
 			(yyval)=new statement(S_TYPE_FUNC,(yyvsp[-3]),(yyvsp[-1]));
 }
-#line 1616 "y.tab.c" /* yacc.c:1646  */
+#line 1617 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 125 "minipy.y" /* yacc.c:1646  */
+#line 126 "minipy.y" /* yacc.c:1646  */
     {
 				statement *s=new statement(S_TYPE_CREATE_LIST,0,0);
 				(yyval)=new statement(S_TYPE_FUNC,(yyvsp[-2]),s);
 		}
-#line 1625 "y.tab.c" /* yacc.c:1646  */
+#line 1626 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 129 "minipy.y" /* yacc.c:1646  */
+#line 130 "minipy.y" /* yacc.c:1646  */
     {
 			(yyval)=new statement(S_TYPE_OBJFUNC,(yyvsp[-5]),(yyvsp[-3]),(yyvsp[-1]));
 		}
-#line 1633 "y.tab.c" /* yacc.c:1646  */
+#line 1634 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 132 "minipy.y" /* yacc.c:1646  */
+#line 133 "minipy.y" /* yacc.c:1646  */
     {
 			statement *s=new statement(S_TYPE_CREATE_LIST,0,0);
 			(yyval)=new statement(S_TYPE_OBJFUNC,(yyvsp[-4]),(yyvsp[-2]),s);
 		}
-#line 1642 "y.tab.c" /* yacc.c:1646  */
+#line 1643 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 138 "minipy.y" /* yacc.c:1646  */
+#line 139 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);}
-#line 1648 "y.tab.c" /* yacc.c:1646  */
+#line 1649 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 140 "minipy.y" /* yacc.c:1646  */
+#line 141 "minipy.y" /* yacc.c:1646  */
     {
 			(yyval)=new statement(S_TYPE_CREATE_LIST,0,0);
 				}
-#line 1656 "y.tab.c" /* yacc.c:1646  */
+#line 1657 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 143 "minipy.y" /* yacc.c:1646  */
+#line 144 "minipy.y" /* yacc.c:1646  */
     {
 			(yyval)=(yyvsp[-2]);
 	  }
-#line 1664 "y.tab.c" /* yacc.c:1646  */
+#line 1665 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 146 "minipy.y" /* yacc.c:1646  */
+#line 147 "minipy.y" /* yacc.c:1646  */
     {
 	statement *s=new statement(S_TYPE_INSERT,(yyvsp[-3]));
 	s->varm=&varm;
 	(yyval)=new statement(S_TYPE_LISTFOR,(yyvsp[-5]),s,(yyvsp[-1]));
 
 }
-#line 1675 "y.tab.c" /* yacc.c:1646  */
+#line 1676 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 152 "minipy.y" /* yacc.c:1646  */
+#line 153 "minipy.y" /* yacc.c:1646  */
     {
 	(yyval)=new statement(S_TYPE_LISTFOR,(yyvsp[-5]),(yyvsp[-3]),(yyvsp[-1]));
 
 }
-#line 1684 "y.tab.c" /* yacc.c:1646  */
+#line 1685 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 158 "minipy.y" /* yacc.c:1646  */
+#line 159 "minipy.y" /* yacc.c:1646  */
     {}
-#line 1690 "y.tab.c" /* yacc.c:1646  */
+#line 1691 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 159 "minipy.y" /* yacc.c:1646  */
+#line 160 "minipy.y" /* yacc.c:1646  */
     {}
-#line 1696 "y.tab.c" /* yacc.c:1646  */
+#line 1697 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 162 "minipy.y" /* yacc.c:1646  */
+#line 163 "minipy.y" /* yacc.c:1646  */
     {
 		statement*s=new statement(S_TYPE_CREATE_LIST,0,0);
 		(yyval)=new statement(S_TYPE_LISTAPPEND,s,(yyvsp[0]));
 	
 	  }
-#line 1706 "y.tab.c" /* yacc.c:1646  */
+#line 1707 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 167 "minipy.y" /* yacc.c:1646  */
+#line 168 "minipy.y" /* yacc.c:1646  */
     {
 			(yyval)=new statement(S_TYPE_LISTAPPEND,(yyvsp[-2]),(yyvsp[0]));
 	  }
-#line 1714 "y.tab.c" /* yacc.c:1646  */
+#line 1715 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 171 "minipy.y" /* yacc.c:1646  */
+#line 172 "minipy.y" /* yacc.c:1646  */
     {//添加add
 			(yyval)=new statement(S_TYPE_ADD,(yyvsp[-2]),(yyvsp[0]));
 			}
-#line 1722 "y.tab.c" /* yacc.c:1646  */
+#line 1723 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 174 "minipy.y" /* yacc.c:1646  */
+#line 175 "minipy.y" /* yacc.c:1646  */
     {//添加sub
 			(yyval)=new statement(S_TYPE_SUB,(yyvsp[-2]),(yyvsp[0]));
 		  }
-#line 1730 "y.tab.c" /* yacc.c:1646  */
+#line 1731 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 177 "minipy.y" /* yacc.c:1646  */
+#line 178 "minipy.y" /* yacc.c:1646  */
     {
 		    (yyval)=(yyvsp[0]);
 		  }
-#line 1738 "y.tab.c" /* yacc.c:1646  */
+#line 1739 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 180 "minipy.y" /* yacc.c:1646  */
+#line 181 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[-2]);
 }
-#line 1745 "y.tab.c" /* yacc.c:1646  */
+#line 1746 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 182 "minipy.y" /* yacc.c:1646  */
+#line 183 "minipy.y" /* yacc.c:1646  */
     {(yyval)=(yyvsp[0]);
 }
-#line 1752 "y.tab.c" /* yacc.c:1646  */
+#line 1753 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 185 "minipy.y" /* yacc.c:1646  */
+#line 186 "minipy.y" /* yacc.c:1646  */
     { //add method mul
 			(yyval)=new statement(S_TYPE_MUL,(yyvsp[-2]),(yyvsp[0]));
 		}
-#line 1760 "y.tab.c" /* yacc.c:1646  */
+#line 1761 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 188 "minipy.y" /* yacc.c:1646  */
+#line 189 "minipy.y" /* yacc.c:1646  */
     {//add method div
 			(yyval)=new statement(S_TYPE_DIV,(yyvsp[-2]),(yyvsp[0]));
 		}
-#line 1768 "y.tab.c" /* yacc.c:1646  */
+#line 1769 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 191 "minipy.y" /* yacc.c:1646  */
+#line 192 "minipy.y" /* yacc.c:1646  */
     {//add method mod
 			(yyval)=new statement(S_TYPE_MOD,(yyvsp[-2]),(yyvsp[0]));
 		  }
-#line 1776 "y.tab.c" /* yacc.c:1646  */
+#line 1777 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 194 "minipy.y" /* yacc.c:1646  */
+#line 195 "minipy.y" /* yacc.c:1646  */
     {
 		(yyval)=(yyvsp[0]);
 		}
-#line 1784 "y.tab.c" /* yacc.c:1646  */
+#line 1785 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1788 "y.tab.c" /* yacc.c:1646  */
+#line 1789 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2012,7 +2013,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 199 "minipy.y" /* yacc.c:1906  */
+#line 200 "minipy.y" /* yacc.c:1906  */
 
 
 int main()
@@ -2022,7 +2023,8 @@ int main()
 
 void yyerror(char *s)
 {
-   cout << s << endl<<"miniPy> "; 
+cout<<s<<endl; 
+return;
 }
 
 int yywrap()

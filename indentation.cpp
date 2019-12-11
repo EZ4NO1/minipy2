@@ -10,7 +10,6 @@ void indentation::init(){
 void indentation::error(){
 	init();
 	cout<<"indentation error"<<endl;
-	prompt();
 }
 void indentation::addline(statement* s){
 	if (stk.empty()){

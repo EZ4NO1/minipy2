@@ -332,7 +332,7 @@ variable* variable::mod(variable* var1, variable* var2)
                f1 = (float)(*(float*)(var1->value));
                return new variable(f1-((int)(f1/f2))*f2);
         }
-        printf("TypeError: unsupported operand type(s) for %:");
+        cout<<"TypeError: unsupported operand type(s) for %:";
         typeprint(var1->type);
         printf("and");
         typeprint(var2->type);

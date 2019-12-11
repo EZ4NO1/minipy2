@@ -13,12 +13,13 @@ void yyerror(char*);
 %%
 Start :startprompt Lines
       ;
-startprompt:{cout<<">>>";}
-	   ;
+startprompt:{cout<<"Minipy_v2 [Copyright:gy991007,alicemare,ling0-cell@github.com]"<<endl<<">>>";
+}
+;
 Lines : Lines Line '\n'{ind.addline($2);ind.prompt();}
 	  |
 	  |error '\n'{cout<<">>>";}
-		
+	;	
 Line  :SPACE state{$$=$2;$$->space=$1->space;}
 	  |state{$$=$1;$$->space=0;}
 	  |SPACE{$$=new statement(S_TYPE_NOP,0,0);$$->space=$1->space;}
@@ -205,7 +206,8 @@ int main()
 
 void yyerror(char *s)
 {
-   cout << s << endl<<"miniPy> "; 
+cout<<s<<endl; 
+return;
 }
 
 int yywrap()
