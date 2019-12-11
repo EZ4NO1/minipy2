@@ -70,9 +70,12 @@ void indentation::merge(statement* s){
 	if (stk.top()->op==S_TYPE_FOR){
 		stk.top()->src[2]->append(s);
 	}
+	if (stk.top()->op==S_TYPE_WHILE){
+		stk.top()->src[1]->append(s);
+	}
 	}
 
-	if (s->op==S_TYPE_FOR){
+	if ((s->op==S_TYPE_FOR)||(s->op==S_TYPE_WHILE)){
 		stk.push(s);
 		return;
 	}

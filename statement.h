@@ -27,6 +27,11 @@
 #define S_TYPE_LISTFOR 20
 #define S_TYPE_NOP 21
 #define S_TYPE_SPACE 22
+#define S_TYPE_ASBOOL 23
+#define S_TYPE_WHILE 24
+#define S_TYPE_IF 25
+#define S_TYPE_ELSE 26
+#define S_TYPE_IFELSE 27
 class statement {
 public:
 	statement** src;

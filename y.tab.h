@@ -51,7 +51,12 @@ extern int yydebug;
     STRING_LITERAL = 261,
     FOR = 262,
     IN = 263,
-    SPACE = 264
+    SPACE = 264,
+    IF = 265,
+    ELSE = 266,
+    WHILE = 267,
+    TRUE = 268,
+    FALSE = 269
   };
 #endif
 /* Tokens.  */
@@ -62,6 +67,11 @@ extern int yydebug;
 #define FOR 262
 #define IN 263
 #define SPACE 264
+#define IF 265
+#define ELSE 266
+#define WHILE 267
+#define TRUE 268
+#define FALSE 269
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

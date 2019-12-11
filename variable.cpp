@@ -7,6 +7,10 @@ variable::variable(){
 	value=NULL;
 	this->size = 1;
 }
+variable::variable(bool b){
+	this->type=TYPE_BOOL;
+	this->value=new bool(b);
+}
 variable::variable(float n, bool anonymous ) {
 	this->type = TYPE_FLOAT;
 	this->anony = anonymous;
@@ -64,7 +68,13 @@ variable::variable(variable **a,int n,bool anonymous){
 }
 void  variable::print(bool b) {
 if(this==0) {cout<<"error print"<<endl; return;}
-	if (this->type==TYPE_FLOAT)
+	if (this->type==TYPE_BOOL){
+		if (*((bool*)this->value))
+			cout<<"True";
+		else 
+			cout<<"False";
+				}
+		else if (this->type==TYPE_FLOAT)
 			cout<<*((float*)this->value);
 		else if (this->type==TYPE_INT)
 			cout<<*((int*)this->value);

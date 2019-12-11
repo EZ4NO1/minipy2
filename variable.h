@@ -11,6 +11,7 @@
 #define TYPE_LEFT 6
 #define TYPE_LEFTLIST 7
 #define TYPE_LEFTSTR 8
+#define TYPE_BOOL 9
 #define SLEN 100
 using namespace std;
 class variable {
@@ -22,6 +23,7 @@ public:
 	int size = 0;
 public:
 	variable();
+	variable(bool);
 	variable(float,bool=true);
 	variable(int, bool=true);
 	variable(string,bool=true);

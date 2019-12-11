@@ -69,6 +69,24 @@ return FOR;
 in {
 return IN;
 }
+if {
+return IF;
+}
+else {
+return ELSE;
+}
+while {
+return WHILE;
+}
+True {
+yylval=new statement(new variable(true));
+return TRUE;
+}
+False {
+yylval=new statement(new variable(false));
+return FALSE;
+
+}
 {id}        {
 			    variable* t=new variable(string(yytext));
 				yylval=new statement(t);

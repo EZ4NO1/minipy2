@@ -45,6 +45,22 @@ statement::statement(int op,statement*s1,statement*s2,statement*s3,statement*s4)
 
 
 variable* statement::emit(){
+	if (this->op==S_TYPE_WHILE){
+		while(*((bool*)src[0]->emit()->value)){
+			src[1]->emit();
+		}
+		return new variable();
+	}
+	if (this->op==S_TYPE_ASBOOL){
+		variable *v=src[0]->emit();
+		if (v->type=TYPE_BOOL){
+			return v;
+		}
+		if (v->type==TYPE_NONE){
+			return new variable(true);
+				}
+		return new variable(false);
+	}
 	if (this->op==S_TYPE_NOP){
 		return new variable();
 	}
