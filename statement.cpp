@@ -47,13 +47,20 @@ statement::statement(int op,statement*s1,statement*s2,statement*s3,statement*s4)
 variable* statement::emit(){
 	if (this->op==S_TYPE_WHILE){
 		cout<<"here";
-		while(*((bool*)src[0]->emit()->value)){
+		variable *v=src[0]->emit();
+		if (!v) return 0;
+		while(*((bool*)v->value)){
 			src[1]->emit();
+			v=src[0]->emit();
+			if (!v) return 0;
 		}
 		return new variable();
 	}
 	if (this->op==S_TYPE_ASBOOL){
 		variable *v=src[0]->emit();
+		if (!v){
+			return 0;
+		}
 		if (v->type=TYPE_BOOL){
 			return v;
 		}
@@ -68,25 +75,35 @@ variable* statement::emit(){
 	if (this->op==S_TYPE_LISTFOR){
 	 statement* s1=new statement(S_TYPE_CREATE_LIST,(int)0,0);
 	variable *v=s1->emit();
+	if (!v) return 0;
 	statement *s=new statement(v);
         statement *s2=new statement(S_TYPE_LISTAPPEND,s,src[0]);
         statement *s3=new statement(S_TYPE_FOR,src[1],src[2],s2);
 	
-	s3->emit();
+	variable *v1=s3->emit();
+	if (!v1) return 0;
 	return v;
 	}
 	if (this->op == S_TYPE_FOR) {
 		variable*list=this->src[1]->emit();
+		if (!list) return 0;
 		if (list->type == TYPE_LIST) {
 			for (int i = 0; i < list->size; i++) {
 				variable* t = variable::at(list, new variable(i));
 				statement** l = new statement * [2];
 				l[0] = src[0];
 				l[1] = new statement(t);
-				(new statement(S_TYPE_ASSIGN, 2,l))->emit();
-				this->src[2]->emit();
+				variable *v=(new statement(S_TYPE_ASSIGN, 2,l))->emit();
+				if (!v){
+					return 0;
+				}
+				variable *v1=this->src[2]->emit();
+				if (!v1){
+					return 0;
+				}
 			}
 		}
+		else return 0;
 		return new variable();
 	}
 	if (this->op == S_TYPE_ASVAR) {
