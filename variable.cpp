@@ -68,6 +68,7 @@ variable::variable(variable **a,int n,bool anonymous){
 }
 void  variable::print(bool b) {
 if(this==0) {cout<<"error print"<<endl; return;}
+if (this->type==TYPE_SUCCESS) return;
 	if (this->type==TYPE_BOOL){
 		if (*((bool*)this->value))
 			cout<<"True";

@@ -12,6 +12,7 @@
 #define TYPE_LEFTLIST 7
 #define TYPE_LEFTSTR 8
 #define TYPE_BOOL 9
+#define TYPE_SUCCESS 10
 #define SLEN 100
 using namespace std;
 class variable {

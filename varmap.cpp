@@ -85,7 +85,9 @@ variable* varmap::func(variable* var1, variable* var2){//参数被打包成了li
 		if (var2->size==1){
 			variable* var=((variable**)var2->value)[0];
 			var->print();
-			return 0;
+			variable *a=new variable();
+			a->type=TYPE_SUCCESS;
+			return a;
 		}else{ cout<<"TypeError:print() takes exactly one argument("<<var2->size<<" given)";return 0;}
 	}
 	if (funcname=="exit"){
