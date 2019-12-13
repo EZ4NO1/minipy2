@@ -17,6 +17,11 @@ variable* varmap::insert(variable* var1)
 	}
 	key[size] = string(*(string*)var1->value);
 	size++;
+	int len = key1.length();
+        char* data = (char *)malloc((len+1)*sizeof(char));
+        key1.copy(data,len,0);	
+	names[*pname_num]=data;
+	(*pname_num)=(*pname_num)+1;
 	return new variable(pointer + size-1);
 }
 

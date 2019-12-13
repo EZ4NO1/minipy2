@@ -11,6 +11,8 @@ public:
 	string key[VARMAP_MAX_LENGTH];
 	variable* pointer[VARMAP_MAX_LENGTH] ;
 	int size=0;
+	int* pname_num;
+	char** names;
 	varmap();
 	variable* insert(variable*);
 	variable* at(variable*);

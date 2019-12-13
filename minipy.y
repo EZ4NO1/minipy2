@@ -3,22 +3,35 @@
 #include "indentation.h"
  #define YYSTYPE statement*
    #include "lex.yy.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <cstdio>
+char* filename=".command";
+char **character_name_completion(const char *, int, int);
+char *character_name_generator(const char *, int);
+int yaccerror;
+char *names[99] = {
+    "for",
+    "while",
+    "if",
+    "else",
+0
+};
+int name_num=4;
    varmap varm;
    indentation ind;
+
 void yyerror(char*);
 %}
 %token ID INT REAL STRING_LITERAL FOR IN SPACE IF ELSE WHILE TRUE FALSE
 
 
 %%
-Start :startprompt Lines
-      ;
-startprompt:{cout<<"Minipy_v2 [Copyright:gy991007,alicemare,ling0-cell@github.com]"<<endl<<">>>";
-}
-;
-Lines : Lines Line '\n'{ind.addline($2);ind.prompt();}
-	  |
-	  |error '\n'{cout<<">>>";}
+Start : Line  {ind.addline($1);} 
+	  |error {cout<<">>>";}
 	;	
 Line  :SPACE state{$$=$2;$$->space=$1->space;}
 	  |state{$$=$1;$$->space=0;}
@@ -221,7 +234,59 @@ mul_expr : mul_expr '*' factor{ //add method mul
 
 int main()
 {
-   return yyparse();
+cout<<"Minipy_v2 [Copyright:gy991007,alicemare,ling0-cell@github.com]"<<endl;
+ind.init();
+rl_attempted_completion_function = character_name_completion;
+varm.pname_num=&name_num;
+varm.names=names;
+while(1){
+	yaccerror=0;
+	char *buffer;
+	if (ind.stk.empty())
+	buffer = readline(">>>");
+	else buffer=readline("...");
+	remove(filename);
+	FILE* f=fopen(filename,"w");
+	fputs(buffer,f);
+	fclose(f);
+	f=fopen(filename,"r");
+	yyin=f;
+	yyparse();
+	fclose(f);
+	if (!yaccerror)
+	add_history(strdup(buffer));
+}
+}
+
+char ** character_name_completion(const char *text, int start, int end)
+{
+int count;
+char* p;
+int len;
+rl_attempted_completion_over = 1; 
+len=strlen(text);
+if (len==0) {
+char** re=new char*[2];
+re[0]=new char[2];
+re[0][0]='\t';
+re[0][1]=0;
+re[1]=NULL;
+return re;
+}
+count=0;
+    for (int i=0;i<name_num;i++){
+	if (strncmp(names[i],text,len)==0){
+	p=strdup(names[i]);
+	count++;
+	}
+}
+if (count==1){
+char** re=new char*[2];
+re[0]=p;
+re[1]=NULL;
+return re;
+}
+    return NULL;
 }
 
 void yyerror(char *s)
@@ -232,4 +297,5 @@ return;
 }
 
 int yywrap()
-{ return 1; }        		    
+{
+return 1; }        		    
