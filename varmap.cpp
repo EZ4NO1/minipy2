@@ -61,6 +61,10 @@ bool varmap::exsit(variable* var)
 variable* varmap::func(variable* var1, variable* var2){//参数被打包成了list
 	if ((var1==0)||(var2==0)) return 0;
 	string funcname=*(string*)var1->value;
+	if (funcname=="clear"){
+		fputs("\x1b[2J\x1b[H", stdout);
+	}
+	
 	if (funcname=="len"){
 		if (var2->size==1){
 			variable* list=((variable**)var2->value)[0];
@@ -71,7 +75,22 @@ variable* varmap::func(variable* var1, variable* var2){//参数被打包成了li
 	else {cout<<"TypeError:len() takes exactly one argument("<<var2->size<<" given)"; return 0;}
 	}
 	if (funcname=="range"){
-		if (var2->size==1){
+		if(var2->size==2){
+			variable* num1=((variable**)var2->value)[0];
+			variable* num2=((variable**)var2->value)[1];
+			if(num1->type==TYPE_INT&&num2->type==TYPE_INT){
+				int n1 =*(int*)num1->value;
+				int n2 =*(int*)num2->value;
+				variable** l =new variable*[n2-n1];
+			
+			for (int i =n1;i<n2;i++){
+				l[i-n1]=new variable(i);
+			}
+			return new variable(l,n2-n1);	
+			}
+		
+		}
+		else if (var2->size==1){
 			variable* num=((variable**)var2->value)[0];
 			if (num->type==TYPE_INT){
 				int n=*(int*)num->value;
