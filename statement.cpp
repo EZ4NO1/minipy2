@@ -45,12 +45,24 @@ statement::statement(int op,statement*s1,statement*s2,statement*s3,statement*s4)
 
 
 variable* statement::emit(){
+	if(this->op== S_TYPE_IF_ELSE){
+		variable *v=src[0]->emit();
+		if(!v) return 0;
+		if(*((bool*)v->value)){
+			v=src[1]->emit();
+			if(!v) return 0;
+		}else{
+			v=src[2]->emit();
+			if(!v) return 0;
+		}
+		
+		return new variable();
+	}
 	if(this->op == S_TYPE_IF){
 		variable *v=src[0]->emit();
 		if(!v) return 0;
 		if(*((bool*)v->value)){
-			src[1]->emit();
-			v=src[0]->emit();
+			v=src[1]->emit();
 			if(!v) return 0;
 		}
 		return new variable();
@@ -60,8 +72,7 @@ variable* statement::emit(){
 		variable *v=src[0]->emit();
 		if (!v) return 0;
 		while(*((bool*)v->value)){
-			src[1]->emit();
-			v=src[0]->emit();
+			v=src[1]->emit();
 			if (!v) return 0;
 		}
 		return new variable();

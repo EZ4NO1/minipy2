@@ -77,6 +77,9 @@ statement *s1 = new statement(S_TYPE_LIST_OF_S,0,l);
 $$=new statement(S_TYPE_IF,$2,s1);
 }
 |ELSE  ':'{
+statement ** l = new statement*[99];
+statement *s1 = new statement(S_TYPE_LIST_OF_S,0,l);
+$$=new statement(S_TYPE_ELSE,s1);
 }
 ;
 condition:conditional_expr{

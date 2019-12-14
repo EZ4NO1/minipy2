@@ -31,7 +31,7 @@
 #define S_TYPE_WHILE 24
 #define S_TYPE_IF 25
 #define S_TYPE_ELSE 26
-#define S_TYPE_IFELSE 27
+#define S_TYPE_IF_ELSE 27
 
 #define S_TYPE_BOOLOP 28
 #define S_TYPE_L 29
