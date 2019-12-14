@@ -16,12 +16,20 @@ id       {letter}({letter}|{digit})*
 real     {number}"."{number}
 
 %%
-[ ]+      {/*do nothing , just skip */}
-[\t]+ 		{
+[\t ]*\t[\t ]* 		{
+				int count = 0;
 				yylval=new statement(S_TYPE_SPACE,0,0);
-				yylval->space=yyleng;
+				for(int i =0;i<yyleng;i++){
+					if(yytext[i]=='\t')
+						count++;
+				}
+				yylval->space=count;
+				
 				return SPACE;	
 			}
+
+[ ]+      {/*do nothing , just skip */}
+
 {number}    { 
 				int n;
 				n=0;
@@ -69,6 +77,9 @@ return FOR;
 in {
 return IN;
 }
+is {
+return IS;
+}
 if {
 return IF;
 }
@@ -79,14 +90,26 @@ while {
 return WHILE;
 }
 True {
-yylval=new statement(new variable(true));
-return TRUE;
+yylval=new statement(new variable(true,(float)1.0));
+return True;
 }
 False {
 yylval=new statement(new variable(false));
-return FALSE;
+return False;
 
 }
+
+"==" {
+return EQ_OP;
+}
+"!=" {return NE_OP;}
+"<=" {return LE_OP;}
+">=" {return GE_OP;}
+and {return AND_OP;}
+not {return NOT_OP;}
+or {return OR_OP;}
+assert {return ASSERT;}
+
 {id}        {
 			    variable* t=new variable(string(yytext));
 				yylval=new statement(t);

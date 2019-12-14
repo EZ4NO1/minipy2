@@ -45,8 +45,18 @@ statement::statement(int op,statement*s1,statement*s2,statement*s3,statement*s4)
 
 
 variable* statement::emit(){
-	if (this->op==S_TYPE_WHILE){
-		cout<<"here";
+	if(this->op == S_TYPE_IF){
+		variable *v=src[0]->emit();
+		if(!v) return 0;
+		if(*((bool*)v->value)){
+			src[1]->emit();
+			v=src[0]->emit();
+			if(!v) return 0;
+		}
+		return new variable();
+	}
+	else if (this->op==S_TYPE_WHILE){
+		//cout<<"here";
 		variable *v=src[0]->emit();
 		if (!v) return 0;
 		while(*((bool*)v->value)){
@@ -116,6 +126,16 @@ variable* statement::emit(){
 	for (int i = 0; i < this->srcnum; i++) {
 		srcvars[i]=this->src[i]->emit();
 		if (!srcvars[i]) return 0;
+	}
+	if (this->op==S_TYPE_ASBOOL){
+                if(srcvars[0]==0)return new variable(false);
+		if (srcvars[0]->type=TYPE_BOOL){
+			return srcvars[0];
+		}
+		if (srcvars[0]->type==TYPE_NONE){
+			return new variable(true);
+				}
+		return new variable(false);
 	}
 	if (this->op == S_TYPE_LIST_OF_S) {
 		return new variable();
@@ -189,6 +209,55 @@ variable* statement::emit(){
 		srcvars[0]->append(srcvars[1]);
 		return srcvars[0];
 	}	
+	
+	if (this->op == S_TYPE_BOOLOP) {
+            return variable::boolop(srcvars[0]);
+	}
+
+	if (this->op == S_TYPE_L) {
+            return variable::lop(srcvars[0], srcvars[1]);
+	}
+	if (this->op ==S_TYPE_G) {
+		return variable::gop(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_LE) {
+		return variable::leop(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_GE) {
+		return variable::geop(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_EQ) {
+		return variable::eqop(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_NE) {
+		return variable::neop(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_NOT) {
+		return variable::notop(srcvars[0]);
+	}
+	if (this->op == S_TYPE_AND) {
+		return variable::andop(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_OR) {
+		return variable::orop(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_OBJIS) {
+		return variable::objis(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_OBJNOT) {
+		return variable::objnot(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_OBJIN) {
+		return variable::objin(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_OBJNOTIN) {
+		return variable::objnotin(srcvars[0], srcvars[1]);
+	}
+	if (this->op == S_TYPE_ASSERT) {
+		if(srcvars[0]==0)cout<<"AssertionError"<<endl;
+                if((*(bool*)srcvars[0]->value)==false)cout<<"AssertionError"<<endl;
+                return 0;
+	}
 }
 
 void statement::append(statement* s){

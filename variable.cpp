@@ -7,9 +7,10 @@ variable::variable(){
 	value=NULL;
 	this->size = 1;
 }
-variable::variable(bool b){
+variable::variable(bool b,float t){
 	this->type=TYPE_BOOL;
 	this->value=new bool(b);
+	this->relationnum=t;
 }
 variable::variable(float n, bool anonymous ) {
 	this->type = TYPE_FLOAT;
@@ -79,6 +80,8 @@ if (this->type==TYPE_SUCCESS) return;
 			cout<<*((float*)this->value);
 		else if (this->type==TYPE_INT)
 			cout<<*((int*)this->value);
+	else if (this->type==TYPE_BOOL)
+		cout<<'"'<<*((bool*)this->value)<<'"';
 	else if (this->type==TYPE_STR)
 		cout<<'"'<<*((string*)this->value)<<'"';
 	else if (this->type==TYPE_LIST){
@@ -118,6 +121,7 @@ void typeprint(int type){
     if(type==TYPE_INT)printf("int");
     else if(type==TYPE_FLOAT)printf("float");
     else if(type==TYPE_LIST)printf("list");
+    else if(type==TYPE_BOOL)printf("bool");
     else printf("string");
     putchar('\'');
 }
@@ -126,6 +130,7 @@ void typeprint2(int type){
     if(type==TYPE_INT)printf("int");
     else if(type==TYPE_FLOAT)printf("float");
     else if(type==TYPE_LIST)printf("list");
+    else if (type==TYPE_BOOL)printf("bool");
     else printf("string");
 }
 
@@ -148,7 +153,34 @@ variable* variable::add(variable* var1, variable* var2) {
 				f2 = (float)(*(int*)(var2->value));
 			return new variable(f1 + f2);
 		}
-	}
+	} if(var1->type==TYPE_BOOL){
+              if((*(bool*)var1->value)==true){
+                     if(var2->type==TYPE_INT)return new variable(1+(*(int*)(var2->value)));
+                     if(var2->type==TYPE_FLOAT)return new variable((float)(1+(*(float*)(var2->value))));
+                     if(var2->type==TYPE_BOOL){
+                           if(*(bool*)var2->value==true)return new variable(2);
+                           else return new variable(1);
+                     }
+               }
+              if((*(bool*)var1->value)==false){
+                     if(var2->type==TYPE_INT)return new variable((*(int*)(var2->value)));
+                     if(var2->type==TYPE_FLOAT)return new variable((*(float*)(var2->value)));
+                     if(var2->type==TYPE_BOOL){
+                           if(*(bool*)var2->value==true)return new variable(1);
+                           else return new variable(0);
+                     }
+               }
+        }
+        if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                     if(var1->type==TYPE_INT)return new variable(1+(*(int*)(var1->value)));
+                     if(var1->type==TYPE_FLOAT)return new variable((float)(1+(*(float*)(var1->value))));
+               }
+              else{
+                     if(var1->type==TYPE_INT)return new variable((*(int*)(var1->value)));
+                     if(var1->type==TYPE_FLOAT)return new variable((*(float*)(var1->value)));
+               }
+        }
 	if ((var1->type == TYPE_LIST) && (var2->type == TYPE_LIST)) {
 		variable **l = new variable * [var1->size + var2->size];
 		variable** l1 = (variable**)var1->value;
@@ -192,6 +224,34 @@ variable* variable::sub(variable* var1, variable* var2)
 			return new variable(f1 - f2);
 		}
 	}
+	if(var1->type==TYPE_BOOL){
+              if((*(bool*)var1->value)==true){
+                     if(var2->type==TYPE_INT)return new variable(1-(*(int*)(var2->value)));
+                     if(var2->type==TYPE_FLOAT)return new variable((float)(1.0-(*(float*)(var2->value))));
+                     if(var2->type==TYPE_BOOL){
+                           if(*(bool*)var2->value==true)return new variable(0);
+                           else return new variable(1);
+                     }
+               }
+              if((*(bool*)var1->value)==false){
+                     if(var2->type==TYPE_INT)return new variable(-(*(int*)(var2->value)));
+                     if(var2->type==TYPE_FLOAT)return new variable(-(*(float*)(var2->value)));
+                     if(var2->type==TYPE_BOOL){
+                           if(*(bool*)var2->value==true)return new variable(-1);
+                           else return new variable(0);
+                     }
+               }
+        }
+        if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                     if(var1->type==TYPE_INT)return new variable((*(int*)(var1->value))-1);
+                     if(var1->type==TYPE_FLOAT)return new variable((float)((*(float*)(var1->value))-1.0));
+               }
+              else{
+                     if(var1->type==TYPE_INT)return new variable((*(int*)(var1->value)));
+                     if(var1->type==TYPE_FLOAT)return new variable((*(float*)(var1->value)));
+               }
+        }
         printf("TypeError: unsupported operand type(s) for -:");
         typeprint(var1->type);
         printf("and");
@@ -234,6 +294,24 @@ variable* variable::mul(variable* var1, variable* var2) {
 		tep = "";
 		for (int i = 0; i < *(int*)var2->value; i++) {
 			tep = tep + *(string*)var1->value;
+		}
+		return new variable(tep);
+	}
+	if ((var2->type == TYPE_LIST) && (var1->type == TYPE_INT)) {
+		variable** l = new variable * [var2->size*(*(int*)var1->value)];
+		variable** l1 = (variable**)var2->value;
+		for (int i = 0; i < *(int*)var1->value; i++) {
+			for (int j = 0; j < var2->size; j++) {
+				l[i * var2->size + j] = l1[j];
+			}
+		}
+		return new variable(l, var2->size * (*(int*)var1->value));
+	}
+	if ((var2->type == TYPE_STR) && (var1->type == TYPE_INT)) {
+		string tep;
+		tep = "";
+		for (int i = 0; i < *(int*)var1->value; i++) {
+			tep = tep + *(string*)var2->value;
 		}
 		return new variable(tep);
 	}
@@ -728,3 +806,562 @@ void variable::append(variable *var){
 	this->size++;
 	this->value=l;
 }
+
+variable* variable::boolop(variable* var){
+           if(var==0)return new variable(false);
+           if(var->type==TYPE_BOOL)return var;
+           if(var->type==TYPE_INT)
+                 if((*(int*)var->value)==0)
+                          return new variable(false);
+           if(var->type==TYPE_FLOAT)
+                 if((*(float*)var->value)==0.0)
+                          return new variable(false);
+           return new variable(true);
+}
+variable* variable::notop(variable* var){
+           if(var==0)return 0;
+           if(var->type==TYPE_BOOL){
+                 if((*(bool*)var->value)==true)return new variable(false);
+                 else return new variable(true);
+           }
+           if(var->type==TYPE_INT)
+                 if((*(int*)var->value)==0)
+                          return new variable(true);
+           if(var->type==TYPE_FLOAT)
+                 if((*(float*)var->value)==0.0)
+                          return new variable(true);
+           else return new variable(false);
+}
+variable* variable::lop(variable* var1, variable* var2){
+     if(var1==0||var2==0)return 0;
+     if(var1->type==TYPE_STR&&var2->type==TYPE_STR){
+            if((*(string*)var1->value)<(*(string*)var2->value))return new variable(true,(float)1);
+            else return new variable(false);
+     }
+     if(var1->type==TYPE_INT){
+           if(var2->type==TYPE_INT){
+                 if((*(int*)var1->value)<(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((float)(*(int*)var1->value)<(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(int*)var1->value)<1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(int*)var1->value)<0)return new variable(true,(float)0);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_FLOAT){
+           if(var2->type==TYPE_INT){
+                 if((*(float*)var1->value)<(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((*(float*)var1->value)<(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(float*)var1->value)<1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(float*)var1->value)<0)return new variable(true,(float)0);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_BOOL){
+        if((*(bool*)var1->value)==true){
+           if(var2->type==TYPE_INT){
+                 if((int)var1->relationnum<(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if(var1->relationnum<(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                  if(var1->relationnum<1)return new variable(true,(float)1);
+                  else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                  if(var1->relationnum<0)return new variable(true);
+                  else return new variable(false);
+              }
+           }
+        }
+        else{
+                  return new variable(false);
+        }
+     }
+     return new variable(false);
+}
+variable* variable::gop(variable* var1, variable* var2){
+     if(var1==0||var2==0)return 0;
+     if(var1->type==TYPE_STR&&var2->type==TYPE_STR){
+            if((*(string*)var1->value)>(*(string*)var2->value))return new variable(true,(float)1);
+            else return new variable(false);
+     }
+     if(var1->type==TYPE_INT){
+           if(var2->type==TYPE_INT){
+                 if((*(int*)var1->value)>(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((float)(*(int*)var1->value)>(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(int*)var1->value)>1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(int*)var1->value)>0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_FLOAT){
+           if(var2->type==TYPE_INT){
+                 if((*(float*)var1->value)>(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((*(float*)var1->value)>(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(float*)var1->value)>1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(float*)var1->value)>0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_BOOL){
+        if((*(bool*)var1->value)==true){
+           if(var2->type==TYPE_INT){
+                 if(var1->relationnum>(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if(var1->relationnum>(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if(var1->relationnum>1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if(var1->relationnum>0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+        }
+        else{
+               return new variable(false);
+        }
+     }
+    return new variable(false);
+}
+variable* variable::leop(variable* var1, variable* var2){
+    if(var1==0||var2==0)return 0;
+     if(var1->type==TYPE_STR&&var2->type==TYPE_STR){
+            if((*(string*)var1->value)<=(*(string*)var2->value))return new variable(true,(float)1);
+            else return new variable(false);
+     }
+    if(var1->type==TYPE_INT){
+           if(var2->type==TYPE_INT){
+                 if((*(int*)var1->value)<=(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((float)(*(int*)var1->value)<=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(int*)var1->value)<=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(int*)var1->value)<=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_FLOAT){
+           if(var2->type==TYPE_INT){
+                 if((*(float*)var1->value)<=(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((*(float*)var1->value)<=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(float*)var1->value)<=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(float*)var1->value)<=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_BOOL){
+        if((*(bool*)var1->value)==true){
+           if(var2->type==TYPE_INT){
+                 if(var1->relationnum<=(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if(var1->relationnum<=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if(var1->relationnum<=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if(var1->relationnum<=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+        }
+        else{
+               return new variable(false);
+        }
+     }
+    return new variable(false);
+}
+variable* variable::geop(variable* var1, variable* var2){
+    if(var1==0||var2==0)return 0;
+     if(var1->type==TYPE_STR&&var2->type==TYPE_STR){
+            if((*(string*)var1->value)>=(*(string*)var2->value))return new variable(true,(float)1);
+            else return new variable(false);
+     }
+    if(var1->type==TYPE_INT){
+           if(var2->type==TYPE_INT){
+                 if((*(int*)var1->value)>=(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((float)(*(int*)var1->value)>=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(int*)var1->value)>=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(int*)var1->value)>=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_FLOAT){
+           if(var2->type==TYPE_INT){
+                 if((*(float*)var1->value)>=(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((*(float*)var1->value)>=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(float*)var1->value)>=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(float*)var1->value)>=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_BOOL){
+        if((*(bool*)var1->value)==true){
+           if(var2->type==TYPE_INT){
+                 if(var1->relationnum>=(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if(var1->relationnum>=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if(var1->relationnum>=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if(var1->relationnum>=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+        }
+        else{
+               return new variable(false);
+        }
+     }
+    return new variable(false);
+}
+variable* variable::eqop(variable* var1, variable* var2){
+    if(var1==0||var2==0)return 0;
+     if(var1->type==TYPE_STR&&var2->type==TYPE_STR){
+            if((*(string*)var1->value)==(*(string*)var2->value))return new variable(true,(float)1);
+            else return new variable(false);
+     }
+    if(var1->type==TYPE_INT){
+           if(var2->type==TYPE_INT){
+                 if((*(int*)var1->value)==(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((float)(*(int*)var1->value)==(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(int*)var1->value)==1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(int*)var1->value)==0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_FLOAT){
+           if(var2->type==TYPE_INT){
+                 if((*(float*)var1->value)==(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((*(float*)var1->value)==(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(float*)var1->value)==1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(float*)var1->value)==0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_BOOL){
+        if((*(bool*)var1->value)==true){
+           if(var2->type==TYPE_INT){
+                 if(var1->relationnum==(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if(var1->relationnum==(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if(var1->relationnum==1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if(var1->relationnum==0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+        }
+        else{
+               return new variable(false);
+        }
+     }
+    return new variable(false);
+}
+variable* variable::neop(variable* var1, variable* var2){
+    if(var1==0||var2==0)return 0;
+     if(var1->type==TYPE_STR&&var2->type==TYPE_STR){
+            if((*(string*)var1->value)!=(*(string*)var2->value))return new variable(true,(float)1);
+            else return new variable(false);
+     }
+    if(var1->type==TYPE_INT){
+           if(var2->type==TYPE_INT){
+                 if((*(int*)var1->value)!=(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((float)(*(int*)var1->value)!=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(int*)var1->value)!=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(int*)var1->value)!=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_FLOAT){
+           if(var2->type==TYPE_INT){
+                 if((*(float*)var1->value)!=(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if((*(float*)var1->value)!=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if((*(float*)var1->value)!=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if((*(float*)var1->value)!=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+     }
+     if(var1->type==TYPE_BOOL){
+        if((*(bool*)var1->value)==true){
+           if(var2->type==TYPE_INT){
+                 if(var1->relationnum!=(float)(*(int*)var2->value))return new variable(true,(float)(*(int*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_FLOAT){
+                 if(var1->relationnum!=(*(float*)var2->value))return new variable(true,(*(float*)var2->value));
+                 else return new variable(false);
+           }
+           if(var2->type==TYPE_BOOL){
+              if((*(bool*)var2->value)==true){
+                 if(var1->relationnum!=1)return new variable(true,(float)1);
+                 else return new variable(false);
+              }
+              if((*(bool*)var2->value)==false){
+                 if(var1->relationnum!=0)return new variable(true);
+                 else return new variable(false);
+              }
+           }
+        }
+        else{
+               return new variable(false);
+        }
+     }
+    return new variable(false);
+}
+variable* variable::andop(variable* var1, variable* var2){
+           if(var1==0||var2==0)return 0;
+           if(var1->type==TYPE_BOOL)
+                if((*(bool*)var1->value)==true)
+                         if(var2->type==TYPE_BOOL)
+                                if((*(bool*)var2->value)==true)return new variable(true);
+           return new variable(false);
+}
+variable* variable::orop(variable* var1, variable* var2){
+           if(var1==0||var2==0)return 0;
+           if(var1->type==TYPE_BOOL)
+                if((*(bool*)var1->value)==false){
+                         if(var2->type==TYPE_BOOL)
+                                if((*(bool*)var2->value)==false)return new variable(false);
+                         if(var2->type==TYPE_INT)
+                                if((*(int*)var2->value)==0)return new variable(false);
+                         if(var2->type==TYPE_FLOAT)
+                                if((*(float*)var2->value)==0)return new variable(false);
+           }
+           if(var1->type==TYPE_INT)
+                if((*(int*)var1->value)==0){
+                         if(var2->type==TYPE_BOOL)
+                                if((*(bool*)var2->value)==false)return new variable(false);
+                         if(var2->type==TYPE_INT)
+                                if((*(int*)var2->value)==0)return new variable(false);
+                         if(var2->type==TYPE_FLOAT)
+                                if((*(float*)var2->value)==0)return new variable(false);
+           }
+           if(var1->type==TYPE_FLOAT)
+                if((*(float*)var1->value)==0){
+                         if(var2->type==TYPE_BOOL)
+                                if((*(bool*)var2->value)==false)return new variable(false);
+                         if(var2->type==TYPE_INT)
+                                if((*(int*)var2->value)==0)return new variable(false);
+                         if(var2->type==TYPE_FLOAT)
+                                if((*(float*)var2->value)==0)return new variable(false);
+           }
+           return new variable(true);
+}
+bool VariableEqual(variable* var1, variable* var2){
+       if(var1==0||var2==0)return false;
+       if(var1->type==TYPE_INT&&var2->type==TYPE_INT)
+            if((*(int*)var1->value)==(*(int*)var2->value))return true;
+       if(var1->type==TYPE_FLOAT&&var2->type==TYPE_FLOAT)
+            if((*(float*)var1->value)==(*(float*)var2->value))return true;
+       if(var1->type==TYPE_STR&&var2->type==TYPE_STR)
+            if((*(string*)var1->value)==(*(string*)var2->value))return true;
+       if(var1->type==TYPE_LIST&&var2->type==TYPE_LIST)
+            if(var1->value==var2->value)return true;
+       if(var1->type==TYPE_BOOL&&var2->type==TYPE_BOOL)
+            if((*(bool*)var1->value)==(*(bool*)var2->value))return true;
+       return false;
+}
+variable* variable::objis(variable* var1, variable* var2){
+       if(var1==0||var2==0)return 0;
+       if(VariableEqual(var1,var2))
+             return new variable(true,(float)1);
+       return new variable(false);
+}
+variable* variable::objnot(variable* var1, variable* var2){
+       if(var1==0||var2==0)return 0;
+       return variable::notop(variable::objis(var1,var2));
+}
+variable* variable::objin(variable* var1, variable* var2){
+       if(var1==0||var2==0)return 0;
+       if(var2->type==TYPE_STR){
+             if(var1->type==TYPE_STR){
+                    if((*(string*)var2->value).find((*(string*)var2->value))!=string::npos)
+                           return new variable(true,(float)1);
+                    else return new variable(false);
+             }
+             else{
+                    cout<<"TypeError: \'in <string>\' requires string as left operand,not ";
+                    typeprint2(var1->type);
+                    cout<<endl;
+                    return 0;
+            }
+       }
+       if(var2->type==TYPE_LIST){
+            int i;
+            for(i=0;i<var2->size;i++)
+                 if(VariableEqual(var1,((variable**)var2->value)[i]))break;
+            if(i<var2->size)return new variable(true,(float)1);
+            else return new variable(false);
+       }
+       cout<<"TypeError: argument of type ";
+       typeprint(var2->type);
+       cout<<" is not iterable"<<endl;
+       return 0;
+}
+variable* variable::objnotin(variable* var1, variable* var2){
+       if(var1==0||var2==0)return 0;
+       return variable::notop(variable::objin(var1,var2));
+}
+

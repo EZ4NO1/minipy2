@@ -22,9 +22,10 @@ public:
 	//bool naint = true;//not a int
 	bool anony = true;
 	int size = 0;
+	float relationnum = 0.0;
 public:
 	variable();
-	variable(bool);
+	variable(bool,float=0.0);
 	variable(float,bool=true);
 	variable(int, bool=true);
 	variable(string,bool=true);
@@ -48,6 +49,20 @@ public:
 	static variable* posop(variable*);
 	static variable* negop(variable*);
 	void append(variable*);
+	static variable* boolop(variable*);
+	static variable* notop(variable*);
+	static variable* lop(variable*, variable*);
+	static variable* gop(variable*, variable*);
+	static variable* leop(variable*, variable*);
+	static variable* geop(variable*, variable*);
+	static variable* eqop(variable*, variable*);
+	static variable* neop(variable*, variable*);
+	static variable* andop(variable*, variable*);
+	static variable* objis(variable*, variable*);
+	static variable* objnot(variable*, variable*);
+	static variable* objin(variable*, variable*);
+	static variable* objnotin(variable*, variable*);
+	static variable* orop(variable*, variable*);
 };
 #endif
 

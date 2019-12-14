@@ -32,6 +32,22 @@
 #define S_TYPE_IF 25
 #define S_TYPE_ELSE 26
 #define S_TYPE_IFELSE 27
+
+#define S_TYPE_BOOLOP 28
+#define S_TYPE_L 29
+#define S_TYPE_G 30
+#define S_TYPE_LE 31
+#define S_TYPE_GE 32
+#define S_TYPE_NOT 33
+#define S_TYPE_AND 34
+#define S_TYPE_OR 35
+#define S_TYPE_EQ 36
+#define S_TYPE_NE 37
+#define S_TYPE_OBJIS 38
+#define S_TYPE_OBJNOT 39
+#define S_TYPE_OBJIN 40
+#define S_TYPE_OBJNOTIN 41
+#define S_TYPE_ASSERT 42
 class statement {
 public:
 	statement** src;

@@ -167,6 +167,7 @@ void varmap::assign(variable* var1,variable* var2){
               }
               else{}
         }
+	return ;
 }
 varmap::~varmap()
 {

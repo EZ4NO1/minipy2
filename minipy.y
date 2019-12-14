@@ -1,8 +1,8 @@
 %{
    /* definition */
 #include "indentation.h"
- #define YYSTYPE statement*
-   #include "lex.yy.c"
+#define YYSTYPE statement*
+#include "lex.yy.c"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,7 +26,7 @@ int name_num=4;
 
 void yyerror(char*);
 %}
-%token ID INT REAL STRING_LITERAL FOR IN SPACE IF ELSE WHILE TRUE FALSE
+%token ID INT REAL STRING_LITERAL FOR IN SPACE IF ELSE WHILE True False AND_OP OR_OP NOT_OP LE_OP GE_OP NE_OP EQ_OP IS ASSERT
 
 
 %%
@@ -36,7 +36,9 @@ Start : Line  {ind.addline($1);}
 Line  :SPACE state{$$=$2;$$->space=$1->space;}
 	  |state{$$=$1;$$->space=0;}
 	  |SPACE{$$=new statement(S_TYPE_NOP,0,0);$$->space=$1->space;}
-	  |{$$=new statement(S_TYPE_NOP,0,0);$$->space=0;}
+	  |{$$=new statement(S_TYPE_NOP,0,0);$$->space=0;
+	    $$->varm=&varm;
+	  }
 	  ;
 
 
@@ -48,8 +50,9 @@ state:ID '=' add_expr{
            |left_expr '=' add_expr{ //add method assign combining insert and change
 				$$= new statement(S_TYPE_ASSIGN,$1,$3);
 				}
-		   | add_expr {//打包成print(add_expr)
-				$$=new statement(S_TYPE_PRINT,$1);
+				 |ASSERT condition{$$=new statement(S_TYPE_ASSERT,$2);}
+                   |conditional_expr{
+			$$=new statement(S_TYPE_PRINT,$1);
 				}
 		   | FOR ID IN add_expr ':'{
 				statement *s=new statement(S_TYPE_INSERT,$2);
@@ -69,16 +72,18 @@ state:ID '=' add_expr{
 	$$= new statement(S_TYPE_WHILE,$2,s1);
 }
 |IF condition ':'{
+statement ** l = new statement*[99];
+statement *s1 = new statement(S_TYPE_LIST_OF_S,0,l);
+$$=new statement(S_TYPE_IF,$2,s1);
 }
-|ELSE condition ':'{
+|ELSE  ':'{
 }
 ;
-condition:add_expr{
-		$$=new statement(S_TYPE_ASBOOL,$1);}
+condition:conditional_expr{
+                statement *s=new statement(S_TYPE_BOOLOP,$1);
+                s->varm=&varm;
+		$$=new statement(S_TYPE_ASBOOL,s);}
 ;
-logic_expr:TRUE{$$=$1;}
-	  |FALSE{$$=$1;}
-	  ;
 	  
 left_expr:atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{
 	  $$=new statement(S_TYPE_LEFTSLICE,$1,$3,$5,$6);
@@ -112,6 +117,8 @@ atom  : ID  {
 
       | List {$$=$1;}
       | number {$$=$1;}
+      | True{$$=$1;}
+      | False{$$=$1;}
       ;
 
 
@@ -211,11 +218,9 @@ add_expr : add_expr '+' mul_expr  {//添加add
 	      |  mul_expr {
 		    $$=$1;
 		  }
-		|'(' add_expr ')' {$$=$1;
-}
-|logic_expr{$$=$1;
-}
-        ;
+
+		
+;
 mul_expr : mul_expr '*' factor{ //add method mul
 			$$=new statement(S_TYPE_MUL,$1,$3);
 		}
@@ -229,6 +234,50 @@ mul_expr : mul_expr '*' factor{ //add method mul
 		$$=$1;
 		}
         ;
+
+object_expr:add_expr{$$=$1;}
+           |atom IS atom{$$=new statement(S_TYPE_OBJIS,$1,$3);}
+           |atom IS NOT_OP atom{$$=new statement(S_TYPE_OBJNOT,$1,$4);}
+           |atom IN atom{$$=new statement(S_TYPE_OBJIN,$1,$3);}
+           |atom NOT_OP IN atom{$$=new statement(S_TYPE_OBJNOTIN,$1,$4);}
+           ;
+relational_expr:object_expr{$$=$1;}
+         | relational_expr '>' add_expr{
+			$$=new statement(S_TYPE_G,$1,$3);
+		}
+         | relational_expr '<' add_expr{
+			$$=new statement(S_TYPE_L,$1,$3);
+		}
+         | relational_expr LE_OP add_expr{
+			$$=new statement(S_TYPE_LE,$1,$3);
+		}
+         | relational_expr GE_OP add_expr{
+			$$=new statement(S_TYPE_GE,$1,$3);
+		}
+         ;
+equality_expr : relational_expr{$$=$1;}
+         | equality_expr EQ_OP relational_expr{
+			$$=new statement(S_TYPE_EQ,$1,$3);
+		}
+         | equality_expr NE_OP relational_expr{
+			$$=new statement(S_TYPE_NE,$1,$3);
+		}
+         ;
+logical_not_expr:equality_expr{$$=$1;}
+                | NOT_OP logical_not_expr{$$=new statement(S_TYPE_NOT,$2);}
+                ;
+logical_and_expr:logical_not_expr{$$=$1;}
+                |logical_and_expr AND_OP logical_not_expr{
+			$$=new statement(S_TYPE_AND,$1,$3);
+		}
+                ;
+logical_or_expr:logical_and_expr{$$=$1;}
+               |logical_or_expr OR_OP logical_and_expr{
+			$$=new statement(S_TYPE_OR,$1,$3);
+		}
+               ;
+conditional_expr:logical_or_expr{$$=$1;}
+                ;
 
 %%
 
