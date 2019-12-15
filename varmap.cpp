@@ -170,11 +170,17 @@ void varmap::assign(variable* var1,variable* var2){
 		else *(variable**)(var1->value)=var2;
 	}
 	else if (var1->type==TYPE_LEFTLIST){
+		variable **ss=new variable*[var2->size];
 		if ((var2->type==TYPE_LIST)&&(var2->size==var1->size)){
 			for (int i=0;i<var1->size;i++){
 				if((((variable**)var2->value)[i]->type==TYPE_INT)||(((variable**)var2->value)[i]->type==TYPE_FLOAT))
-				*(((variable***)var1->value)[i])=new variable(((variable**)var2->value)[i]);
-				else *(((variable***)var1->value)[i])=((variable**)var2->value)[i];
+				ss[i]=new variable(((variable**)var2->value)[i]);
+				else ss[i]=((variable**)var2->value)[i];
+			}
+			for (int i=0;i<var1->size;i++){
+if((((variable**)var2->value)[i]->type==TYPE_INT)||(((variable**)var2->value)[i]->type==TYPE_FLOAT))
+				*(((variable***)var1->value)[i])=new variable(ss[i]);
+				else *(((variable***)var1->value)[i])=ss[i];
 		          }
 		}
 		else{}
