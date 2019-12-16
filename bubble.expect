@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+set timeout -1
+
+spawn ./main.out
+expect ">>>"
+send -- "a=\[100,-10,14,56,72,99,0\]\n"
+expect ">>>"
+send -- "for i in range(len(a)):\n"
+expect "..."
+send -- "\tfor j in range(len(a)-i-1):\n"
+expect "..."
+send -- "\t\tif a\[j\] > a\[j+1\]:\n"
+expect "..."
+send -- "\t\t\tt=a\[j\]\n"
+expect "..."
+send -- "\t\t\ta\[j\]=a\[j+1\]\n"
+expect "..."
+send -- "\t\t\ta\[j+1\]=t\n"
+expect "..."
+send -- "\n"
+expect ">>>"
+send -- "a\n"
+expect ">>>"
+send -- "exit()\n"
