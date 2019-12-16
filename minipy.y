@@ -31,7 +31,7 @@ void yyerror(char*);
 
 %%
 Start : Line  {ind.addline($1);} 
-	  |error {cout<<">>>";}
+	  |error{}
 	;	
 Line  :SPACE state{$$=$2;$$->space=$1->space;}
 	  |state{$$=$1;$$->space=0;}

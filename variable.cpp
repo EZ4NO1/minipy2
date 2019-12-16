@@ -816,6 +816,13 @@ variable* variable::boolop(variable* var){
            if(var->type==TYPE_FLOAT)
                  if((*(float*)var->value)==0.0)
                           return new variable(false);
+	   if(var->type==TYPE_LIST)
+		   if(var->size==0)
+			return new variable(false);
+	   if(var->type==TYPE_STR)
+		   if((*(string*)var->value)=="")
+			   return new variable(false);
+
            return new variable(true);
 }
 variable* variable::notop(variable* var){
