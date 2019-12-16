@@ -122,6 +122,7 @@ atom  : ID  {
       | number {$$=$1;}
       | True{$$=$1;}
       | False{$$=$1;}
+      | '(' conditional_expr')'{$$=$2;}
       ;
 
 
@@ -133,6 +134,7 @@ sub_expr:  /*  empty production */{$$=new statement(new variable());}
         | add_expr{$$=$1;}
         ;        
 atom_expr : atom  {$$=$1;}
+
         | atom_expr  '[' sub_expr  ':' sub_expr  slice_op ']'{
 		$$=new statement(S_TYPE_SLICE,$1,$3,$5,$6);
 		}
@@ -140,7 +142,6 @@ atom_expr : atom  {$$=$1;}
 		$$=new statement(S_TYPE_AT,$1,$3);
 		}
 		|func_exper{$$=$1;}
-|'(' atom_expr')' {$$=$1;}
         ;
 
 func_exper: func_name  '(' List_items ')'{
